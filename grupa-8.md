@@ -1,0 +1,1 @@
+Asta este prima schimbare a grupei 8
