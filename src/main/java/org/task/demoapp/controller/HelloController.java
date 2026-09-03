@@ -1,4 +1,4 @@
-package org.task.demoapp;
+package org.task.demoapp.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

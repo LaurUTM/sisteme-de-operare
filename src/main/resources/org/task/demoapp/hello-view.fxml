@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TabPane?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.task.demoapp.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<TabPane xmlns:fx="http://javafx.com/fxml"
+         prefWidth="850.0"
+         prefHeight="600.0"
+         tabClosingPolicy="UNAVAILABLE"
+         style="-fx-background-color: #f4f6f8;">
+    <tabs>
+        <fx:include source="pomodoro-tab.fxml"/>
+        <fx:include source="fitness-tab.fxml"/>
+    </tabs>
+</TabPane>
