@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<Tab xmlns:fx="http://javafx.com/fxml"
+     text="Pomodoro Timer"
+     fx:controller="org.task.demoapp.controller.PomodoroController">
+
+    <VBox alignment="TOP_CENTER"
+          spacing="30"
+          style="-fx-background-color: #f4f6f8;">
+
+        <padding>
+            <Insets top="40" right="70" bottom="40" left="70"/>
+        </padding>
+
+        <!-- TITLE -->
+        <Label text="POMODORO TIMER"
+               style="-fx-text-fill: #222222;">
+            <font>
+                <Font size="28"/>
+            </font>
+        </Label>
+
+        <!-- TIMER -->
+        <Label fx:id="pomodoroTimerLabel"
+               text="40:00"
+               style="
+                    -fx-text-fill: #222222;
+                    -fx-font-weight: bold;
+                    -fx-background-color: white;
+                    -fx-background-radius: 20;
+                    -fx-padding: 25 60 25 60;
+                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 15, 0, 0, 4);
+               ">
+            <font>
+                <Font size="54"/>
+            </font>
+        </Label>
+
+        <!-- SLIDER CARD -->
+        <VBox spacing="18"
+              alignment="CENTER"
+              maxWidth="650"
+              style="
+                    -fx-background-color: white;
+                    -fx-background-radius: 18;
+                    -fx-padding: 25;
+                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);
+              ">
+
+            <Label text="Work / Rest Distribution"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Label text="Move the slider to choose how the 12 sections are divided"
+                   style="-fx-text-fill: #777777;"/>
+
+            <Slider fx:id="workRestSlider"
+                    min="0"
+                    max="12"
+                    value="8"
+                    majorTickUnit="1"
+                    minorTickCount="0"
+                    blockIncrement="1"
+                    snapToTicks="true"
+                    showTickMarks="true"
+                    showTickLabels="true"
+                    prefWidth="580"
+                    onMouseReleased="#setSections"
+            />
+
+            <HBox alignment="CENTER"
+                  spacing="60">
+
+                <VBox alignment="CENTER">
+                    <Label text="WORK"
+                           style="-fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
+                    <Label fx:id="workSectionsLabel"
+                           text="40 min"
+                           style="-fx-font-size: 18px;"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL"
+                           prefHeight="45"/>
+
+                <VBox alignment="CENTER">
+                    <Label text="REST"
+                           style="-fx-text-fill: #d84315; -fx-font-weight: bold;"/>
+                    <Label fx:id="restSectionsLabel"
+                           text="20 min"
+                           style="-fx-font-size: 18px;"/>
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+        <Label fx:id="pomodoroStateLabel"
+               text="Ready"
+               style="
+                    -fx-font-size: 16px;
+                    -fx-text-fill: #777777;
+               "/>
+
+        <HBox alignment="CENTER"
+              spacing="20">
+
+            <Button fx:id="pomodoroStartButton"
+                    text="START"
+                    prefWidth="150"
+                    prefHeight="48"
+                    style="
+                        -fx-background-color: #2e7d32;
+                        -fx-text-fill: white;
+                        -fx-font-size: 16px;
+                        -fx-font-weight: bold;
+                        -fx-background-radius: 10;
+                        -fx-cursor: hand;
+                    "
+                    onAction="#startTimer"
+            />
+
+            <Button fx:id="pomodoroResetButton"
+                    text="STOP / RESET"
+                    prefWidth="150"
+                    prefHeight="48"
+                    style="
+                        -fx-background-color: #d84315;
+                        -fx-text-fill: white;
+                        -fx-font-size: 16px;
+                        -fx-font-weight: bold;
+                        -fx-background-radius: 10;
+                        -fx-cursor: hand;"
+                    onAction="#stopTimer"
+            />
+
+        </HBox>
+
+    </VBox>
+
+</Tab>
