@@ -14,12 +14,9 @@ import md.utm.smarttimermanager.timer.FocusCycleTimer;
 import md.utm.smarttimermanager.timer.PersistentStopwatch;
 import md.utm.smarttimermanager.timer.ScheduledAlarmTimer;
 
-
 public class HelloController {
 
-    // =====================================================
-    // TIMER 1 - COUNTDOWN TIMER
-    // =====================================================
+    // TIMER 1
 
     @FXML
     private TextField countdownHoursField;
@@ -39,9 +36,7 @@ public class HelloController {
     private CountdownTimer countdownTimer;
 
 
-    // =====================================================
-    // TIMER 2 - SCHEDULED TASK ALARM
-    // =====================================================
+    // TIMER 2
 
     @FXML
     private TextField exactHourField;
@@ -67,9 +62,7 @@ public class HelloController {
     private ScheduledAlarmTimer scheduledAlarmTimer;
 
 
-    // =====================================================
-    // TIMER 3 - SMART FOCUS CYCLE
-    // =====================================================
+    // TIMER 3 - AL TAU
 
     @FXML
     private TextField focusMinutesField;
@@ -98,12 +91,10 @@ public class HelloController {
     @FXML
     private ProgressBar focusProgressBar;
 
-    private FocusCycleTimer focusCycleTimer;
+    private FocusCycleTimer timerFocus;
 
 
-    // =====================================================
-    // TIMER 4 - PERIODIC REMINDER CLOCK
-    // =====================================================
+    // TIMER 4 - AL TAU
 
     @FXML
     private Label persistentTimeLabel;
@@ -117,28 +108,20 @@ public class HelloController {
     @FXML
     private Label reminderStatusLabel;
 
-    private PersistentStopwatch persistentStopwatch;
+    private PersistentStopwatch timerReminder;
 
-
-    // =====================================================
-    // INITIALIZE
-    // =====================================================
 
     @FXML
     public void initialize() {
 
-        // -------------------------------------------------
         // TIMER 1
-        // -------------------------------------------------
 
         countdownTimer = new CountdownTimer(
                 () -> Platform.runLater(this::updateCountdown)
         );
 
 
-        // -------------------------------------------------
         // TIMER 2
-        // -------------------------------------------------
 
         scheduledAlarmTimer = new ScheduledAlarmTimer(
                 () -> Platform.runLater(this::alarmFinished)
@@ -148,94 +131,71 @@ public class HelloController {
         exactActionComboBox.getItems().add("Console message");
 
 
-        // -------------------------------------------------
         // TIMER 3
-        // -------------------------------------------------
 
-        focusCycleTimer = new FocusCycleTimer(
+        timerFocus = new FocusCycleTimer(
 
                 () -> Platform.runLater(
-                        this::updateFocus
+                        this::actualizeazaFocus
                 ),
 
                 () -> Platform.runLater(() -> {
 
-                    focusStatusLabel.setText(
-                            "● Finished"
-                    );
+                    focusStatusLabel.setText("● Finished");
 
                     focusProgressBar.setProgress(1);
                 })
         );
 
 
-        // -------------------------------------------------
         // TIMER 4
-        // -------------------------------------------------
 
-        persistentStopwatch = new PersistentStopwatch(
+        timerReminder = new PersistentStopwatch(
 
-                // actualizează ora și countdown-ul
                 () -> Platform.runLater(
-                        this::updatePersistentClock
+                        this::actualizeazaCeas
                 ),
 
-                // afișează reminderul
                 () -> Platform.runLater(
-                        this::showClockReminder
+                        this::afiseazaReminder
                 )
         );
 
-
-        // Ora reală pornește automat
-        persistentStopwatch.start();
-
-        // Afișare inițială
-        updatePersistentClock();
+        timerReminder.start();
     }
 
 
     // =====================================================
-    // TIMER 1 - START
+    // TIMER 1
     // =====================================================
 
     @FXML
     private void startCountdown() {
 
-        // Dacă era pe pauză, continuă
         if (countdownTimer.isPaused()) {
 
             countdownTimer.start();
 
-            countdownStatusLabel.setText(
-                    "● Running"
-            );
+            countdownStatusLabel.setText("● Running");
 
             return;
         }
-
 
         try {
 
             int hours =
                     Integer.parseInt(
-                            countdownHoursField
-                                    .getText()
-                                    .trim()
+                            countdownHoursField.getText().trim()
                     );
 
             int minutes =
                     Integer.parseInt(
-                            countdownMinutesField
-                                    .getText()
-                                    .trim()
+                            countdownMinutesField.getText().trim()
                     );
 
             int seconds =
                     Integer.parseInt(
-                            countdownSecondsField
-                                    .getText()
-                                    .trim()
+                            countdownSecondsField.getText().trim()
                     );
 
 
@@ -257,14 +217,11 @@ public class HelloController {
                     seconds
             );
 
-
             countdownTimer.start();
-
 
             countdownStatusLabel.setText(
                     "● Running"
             );
-
 
         } catch (NumberFormatException e) {
 
@@ -274,10 +231,6 @@ public class HelloController {
         }
     }
 
-
-    // =====================================================
-    // TIMER 1 - PAUSE
-    // =====================================================
 
     @FXML
     private void pauseCountdown() {
@@ -289,10 +242,6 @@ public class HelloController {
         );
     }
 
-
-    // =====================================================
-    // TIMER 1 - CANCEL
-    // =====================================================
 
     @FXML
     private void cancelCountdown() {
@@ -307,20 +256,14 @@ public class HelloController {
     }
 
 
-    // =====================================================
-    // TIMER 1 - UPDATE
-    // =====================================================
-
     private void updateCountdown() {
 
         int seconds =
                 countdownTimer.getRemainingSeconds();
 
-
         countdownTimeLabel.setText(
                 CountdownTimer.formatTime(seconds)
         );
-
 
         if (seconds <= 0 &&
                 !countdownTimer.isRunning()) {
@@ -333,7 +276,7 @@ public class HelloController {
 
 
     // =====================================================
-    // TIMER 2 - SCHEDULE
+    // TIMER 2
     // =====================================================
 
     @FXML
@@ -343,23 +286,17 @@ public class HelloController {
 
             int hour =
                     Integer.parseInt(
-                            exactHourField
-                                    .getText()
-                                    .trim()
+                            exactHourField.getText().trim()
                     );
 
             int minute =
                     Integer.parseInt(
-                            exactMinuteField
-                                    .getText()
-                                    .trim()
+                            exactMinuteField.getText().trim()
                     );
 
             int second =
                     Integer.parseInt(
-                            exactSecondField
-                                    .getText()
-                                    .trim()
+                            exactSecondField.getText().trim()
                     );
 
 
@@ -394,11 +331,9 @@ public class HelloController {
 
             scheduledAlarmTimer.start();
 
-
             exactStatusLabel.setText(
                     "● Waiting"
             );
-
 
         } catch (NumberFormatException e) {
 
@@ -408,10 +343,6 @@ public class HelloController {
         }
     }
 
-
-    // =====================================================
-    // TIMER 2 - CANCEL
-    // =====================================================
 
     @FXML
     private void cancelExact() {
@@ -423,10 +354,6 @@ public class HelloController {
         );
     }
 
-
-    // =====================================================
-    // TIMER 2 - ALARM
-    // =====================================================
 
     private void alarmFinished() {
 
@@ -449,9 +376,7 @@ public class HelloController {
                             Alert.AlertType.INFORMATION
                     );
 
-            alert.setTitle(
-                    "Alarm"
-            );
+            alert.setTitle("Alarm");
 
             alert.setHeaderText(
                     "Time is up!"
@@ -475,16 +400,15 @@ public class HelloController {
 
 
     // =====================================================
-    // TIMER 3 - START
+    // TIMER 3 - FOCUS CYCLE
     // =====================================================
 
     @FXML
     private void startFocus() {
 
-        // Dacă este pe pauză, continuă
-        if (focusCycleTimer.isPaused()) {
+        if (timerFocus.isPaused()) {
 
-            focusCycleTimer.start();
+            timerFocus.start();
 
             focusStatusLabel.setText(
                     "● Running"
@@ -496,31 +420,25 @@ public class HelloController {
 
         try {
 
-            int focusMinutes =
+            int minuteFocus =
                     Integer.parseInt(
-                            focusMinutesField
-                                    .getText()
-                                    .trim()
+                            focusMinutesField.getText().trim()
                     );
 
-            int breakMinutes =
+            int minutePauza =
                     Integer.parseInt(
-                            breakMinutesField
-                                    .getText()
-                                    .trim()
+                            breakMinutesField.getText().trim()
                     );
 
-            int cycles =
+            int cicluri =
                     Integer.parseInt(
-                            focusCyclesField
-                                    .getText()
-                                    .trim()
+                            focusCyclesField.getText().trim()
                     );
 
 
-            if (focusMinutes <= 0 ||
-                    breakMinutes <= 0 ||
-                    cycles <= 0) {
+            if (minuteFocus <= 0 ||
+                    minutePauza <= 0 ||
+                    cicluri <= 0) {
 
                 focusStatusLabel.setText(
                         "● Invalid value"
@@ -530,27 +448,27 @@ public class HelloController {
             }
 
 
-            boolean autoStart =
+            boolean pornireAutomata =
                     autoStartCheckBox.isSelected();
 
 
-            focusCycleTimer.setSettings(
-                    focusMinutes,
-                    breakMinutes,
-                    cycles,
-                    autoStart
+            timerFocus.setSettings(
+                    minuteFocus,
+                    minutePauza,
+                    cicluri,
+                    pornireAutomata
             );
 
 
-            updateFocus();
-
-
-            focusCycleTimer.start();
+            timerFocus.start();
 
 
             focusStatusLabel.setText(
                     "● Running"
             );
+
+
+            actualizeazaFocus();
 
 
         } catch (NumberFormatException e) {
@@ -562,14 +480,10 @@ public class HelloController {
     }
 
 
-    // =====================================================
-    // TIMER 3 - PAUSE
-    // =====================================================
-
     @FXML
     private void pauseFocus() {
 
-        focusCycleTimer.pause();
+        timerFocus.pause();
 
         focusStatusLabel.setText(
                 "● Paused"
@@ -577,102 +491,82 @@ public class HelloController {
     }
 
 
-    // =====================================================
-    // TIMER 3 - SKIP
-    // =====================================================
-
     @FXML
     private void skipFocus() {
 
-        focusCycleTimer.skip();
+        timerFocus.skip();
 
-        updateFocus();
+        actualizeazaFocus();
     }
 
-
-    // =====================================================
-    // TIMER 3 - STOP
-    // =====================================================
 
     @FXML
     private void stopFocus() {
 
-        focusCycleTimer.stop();
-
-        updateFocus();
-
-        focusProgressBar.setProgress(0);
+        timerFocus.stop();
 
         focusStatusLabel.setText(
                 "● Ready"
         );
+
+        focusProgressBar.setProgress(0);
+
+        actualizeazaFocus();
     }
 
 
-    // =====================================================
-    // TIMER 3 - UPDATE
-    // =====================================================
+    private void actualizeazaFocus() {
 
-    private void updateFocus() {
-
-        int seconds =
-                focusCycleTimer.getRemainingSeconds();
+        int secunde =
+                timerFocus.getRemainingSeconds();
 
 
         focusTimeLabel.setText(
-                FocusCycleTimer.formatTime(seconds)
+                FocusCycleTimer.formatTime(secunde)
         );
 
 
         focusPhaseLabel.setText(
-                focusCycleTimer.getPhaseText()
+                timerFocus.getPhaseText()
         );
 
 
         focusCycleLabel.setText(
                 "Cycle "
-                        + focusCycleTimer.getCurrentCycle()
+                        + timerFocus.getCurrentCycle()
                         + " of "
-                        + focusCycleTimer.getTotalCycles()
+                        + timerFocus.getTotalCycles()
         );
 
 
-        updateProgress();
+        actualizeazaProgres();
     }
 
 
-    // =====================================================
-    // TIMER 3 - PROGRESS BAR
-    // =====================================================
-
-    private void updateProgress() {
+    private void actualizeazaProgres() {
 
         try {
 
-            int totalSeconds;
+            int totalSecunde;
 
 
-            if (focusCycleTimer.isFocusPhase()) {
+            if (timerFocus.isFocusPhase()) {
 
-                totalSeconds =
+                totalSecunde =
                         Integer.parseInt(
-                                focusMinutesField
-                                        .getText()
-                                        .trim()
+                                focusMinutesField.getText().trim()
                         ) * 60;
 
             } else {
 
-                totalSeconds =
+                totalSecunde =
                         Integer.parseInt(
-                                breakMinutesField
-                                        .getText()
-                                        .trim()
+                                breakMinutesField.getText().trim()
                         ) * 60;
             }
 
 
-            if (totalSeconds <= 0) {
+            if (totalSecunde <= 0) {
 
                 focusProgressBar.setProgress(0);
 
@@ -680,18 +574,18 @@ public class HelloController {
             }
 
 
-            int remaining =
-                    focusCycleTimer.getRemainingSeconds();
+            int secundeRamase =
+                    timerFocus.getRemainingSeconds();
 
 
-            double progress =
+            double progres =
                     1.0 -
-                            ((double) remaining
-                                    / totalSeconds);
+                            ((double) secundeRamase
+                                    / totalSecunde);
 
 
             focusProgressBar.setProgress(
-                    progress
+                    progres
             );
 
 
@@ -703,23 +597,35 @@ public class HelloController {
 
 
     // =====================================================
-    // TIMER 4 - START REMINDER
+    // TIMER 4 - REMINDER
     // =====================================================
 
     @FXML
     private void startPersistent() {
 
+        if ("● Paused".equals(
+                reminderStatusLabel.getText()
+        )) {
+
+            timerReminder.startReminder();
+
+            reminderStatusLabel.setText(
+                    "● Running"
+            );
+
+            return;
+        }
+
+
         try {
 
-            int minutes =
+            int minute =
                     Integer.parseInt(
-                            reminderMinutesField
-                                    .getText()
-                                    .trim()
+                            reminderMinutesField.getText().trim()
                     );
 
 
-            if (minutes <= 0) {
+            if (minute <= 0) {
 
                 reminderStatusLabel.setText(
                         "● Invalid value"
@@ -729,14 +635,12 @@ public class HelloController {
             }
 
 
-            // Setăm intervalul introdus
-            persistentStopwatch.setReminderMinutes(
-                    minutes
+            timerReminder.setReminderMinutes(
+                    minute
             );
 
 
-            // Pornim reminderul
-            persistentStopwatch.startReminder();
+            timerReminder.startReminder();
 
 
             reminderStatusLabel.setText(
@@ -744,7 +648,7 @@ public class HelloController {
             );
 
 
-            updatePersistentClock();
+            actualizeazaCeas();
 
 
         } catch (NumberFormatException e) {
@@ -756,43 +660,29 @@ public class HelloController {
     }
 
 
-    // =====================================================
-    // TIMER 4 - PAUSE REMINDER
-    // =====================================================
-
     @FXML
     private void pausePersistent() {
 
-        persistentStopwatch.pauseReminder();
-
+        timerReminder.pauseReminder();
 
         reminderStatusLabel.setText(
                 "● Paused"
         );
-
-
-        updatePersistentClock();
     }
 
-
-    // =====================================================
-    // TIMER 4 - RESET REMINDER
-    // =====================================================
 
     @FXML
     private void resetPersistent() {
 
         try {
 
-            int minutes =
+            int minute =
                     Integer.parseInt(
-                            reminderMinutesField
-                                    .getText()
-                                    .trim()
+                            reminderMinutesField.getText().trim()
                     );
 
 
-            if (minutes <= 0) {
+            if (minute <= 0) {
 
                 reminderStatusLabel.setText(
                         "● Invalid value"
@@ -802,14 +692,12 @@ public class HelloController {
             }
 
 
-            // Luăm valoarea actuală din TextField
-            persistentStopwatch.setReminderMinutes(
-                    minutes
+            timerReminder.setReminderMinutes(
+                    minute
             );
 
 
-            // Resetăm countdown-ul
-            persistentStopwatch.resetReminder();
+            timerReminder.resetReminder();
 
 
             reminderStatusLabel.setText(
@@ -817,7 +705,7 @@ public class HelloController {
             );
 
 
-            updatePersistentClock();
+            actualizeazaCeas();
 
 
         } catch (NumberFormatException e) {
@@ -829,53 +717,42 @@ public class HelloController {
     }
 
 
-    // =====================================================
-    // TIMER 4 - UPDATE
-    // =====================================================
+    private void actualizeazaCeas() {
 
-    private void updatePersistentClock() {
-
-        // Ora reală
         persistentTimeLabel.setText(
-                persistentStopwatch.getCurrentTime()
+                timerReminder.getCurrentTime()
         );
 
 
-        // Countdown până la reminder
         reminderCountdownLabel.setText(
-                persistentStopwatch
-                        .getFormattedRemainingTime()
+                timerReminder.getFormattedRemainingTime()
         );
     }
 
 
-    // =====================================================
-    // TIMER 4 - REMINDER
-    // =====================================================
+    private void afiseazaReminder() {
 
-    private void showClockReminder() {
-
-        Alert alert =
+        Alert alerta =
                 new Alert(
                         Alert.AlertType.INFORMATION
                 );
 
 
-        alert.setTitle(
+        alerta.setTitle(
                 "Reminder"
         );
 
 
-        alert.setHeaderText(
+        alerta.setHeaderText(
                 "Time for a break!"
         );
 
 
-        alert.setContentText(
+        alerta.setContentText(
                 "Your reminder interval has finished."
         );
 
 
-        alert.show();
+        alerta.show();
     }
 }
