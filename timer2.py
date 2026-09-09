@@ -1,5 +1,6 @@
 import time
 import tkinter as tk
+from tkinter import ttk
 
 
 class Stopwatch:
@@ -15,6 +16,23 @@ class Stopwatch:
     self.build_ui()
 
   def build_ui(self):
+    # Butoanele colorate (bg) nu se randează pe macOS cu tk.Button (temă
+    # Aqua nativă) — textul alb rămâne invizibil pe fundal alb până la
+    # apăsare. ttk cu tema "clam" randează culorile corect pe orice OS.
+    style = ttk.Style()
+    style.theme_use("clam")
+    for name, color in (
+        ("Green.TButton", "#4CAF50"),
+        ("Red.TButton", "#F44336"),
+        ("Gray.TButton", "#9E9E9E"),
+    ):
+      style.configure(name, background=color, foreground="white", padding=6)
+      style.map(
+          name,
+          background=[("active", color), ("pressed", color)],
+          foreground=[("active", "white"), ("pressed", "white")],
+      )
+
     frame = tk.LabelFrame(
         self.root,
         text="Timer 4: Cronometru (Stopwatch)",
@@ -29,29 +47,26 @@ class Stopwatch:
     frame_btn = tk.Frame(frame)
     frame_btn.pack(pady=5)
 
-    self.btn_start = tk.Button(
+    self.btn_start = ttk.Button(
         frame_btn,
         text="Start",
-        bg="#4CAF50",
-        fg="white",
+        style="Green.TButton",
         command=self.start,
     )
     self.btn_start.pack(side="left", padx=5)
 
-    self.btn_stop = tk.Button(
+    self.btn_stop = ttk.Button(
         frame_btn,
         text="Stop",
-        bg="#F44336",
-        fg="white",
+        style="Red.TButton",
         command=self.stop,
     )
     self.btn_stop.pack(side="left", padx=5)
 
-    self.btn_reset = tk.Button(
+    self.btn_reset = ttk.Button(
         frame_btn,
         text="Resetează",
-        bg="#9E9E9E",
-        fg="white",
+        style="Gray.TButton",
         command=self.reset,
     )
     self.btn_reset.pack(side="left", padx=5)

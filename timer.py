@@ -1,6 +1,6 @@
 import datetime
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 
 class CountdownTimer:
@@ -19,6 +19,24 @@ class CountdownTimer:
     self.build_ui()
 
   def build_ui(self):
+    # Butoanele colorate (bg) nu se randează pe macOS cu tk.Button (temă
+    # Aqua nativă) — textul alb rămâne invizibil pe fundal alb până la
+    # apăsare. ttk cu tema "clam" randează culorile corect pe orice OS.
+    style = ttk.Style()
+    style.theme_use("clam")
+    for name, color in (
+        ("Green.TButton", "#4CAF50"),
+        ("Blue.TButton", "#2196F3"),
+        ("Red.TButton", "#F44336"),
+        ("Orange.TButton", "#FF9800"),
+    ):
+      style.configure(name, background=color, foreground="white", padding=6)
+      style.map(
+          name,
+          background=[("active", color), ("pressed", color)],
+          foreground=[("active", "white"), ("pressed", "white")],
+      )
+
     # TIMER 1: Eveniment programat la o oră fixă (HH:MM:SS)
     frame_t1 = tk.LabelFrame(
         self.root,
@@ -32,11 +50,10 @@ class CountdownTimer:
     self.entry_time1 = tk.Entry(frame_t1)
     self.entry_time1.pack()
 
-    tk.Button(
+    ttk.Button(
         frame_t1,
         text="Setează Alarmă",
-        bg="#4CAF50",
-        fg="white",
+        style="Green.TButton",
         command=self.start_timer1,
     ).pack(pady=5)
 
@@ -56,17 +73,16 @@ class CountdownTimer:
     frame_btn2 = tk.Frame(frame_t2)
     frame_btn2.pack(pady=5)
 
-    self.btn_start2 = tk.Button(
+    self.btn_start2 = ttk.Button(
         frame_btn2,
         text="Start",
-        bg="#2196F3",
-        fg="white",
+        style="Blue.TButton",
         command=self.start_timer2,
     )
     self.btn_start2.pack(side="left", padx=5)
 
-    self.btn_stop2 = tk.Button(
-        frame_btn2, text="Stop", bg="#F44336", fg="white", command=self.stop_timer2
+    self.btn_stop2 = ttk.Button(
+        frame_btn2, text="Stop", style="Red.TButton", command=self.stop_timer2
     )
     self.btn_stop2.pack(side="left", padx=5)
 
@@ -80,11 +96,10 @@ class CountdownTimer:
     self.entry_delay3 = tk.Entry(frame_t3)
     self.entry_delay3.pack()
 
-    tk.Button(
+    ttk.Button(
         frame_t3,
         text="Pornește Timer 3",
-        bg="#FF9800",
-        fg="white",
+        style="Orange.TButton",
         command=self.trigger_timer3,
     ).pack(pady=5)
 
