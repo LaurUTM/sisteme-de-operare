@@ -3,7 +3,6 @@ import threading
 import time
 
 class TimerTask:
-    """Echivalentul lui java.util.TimerTask. Se suprascrie metoda run()."""
 
     def run(self):
         raise NotImplementedError("Suprascrieti metoda run() in subclasa.")
@@ -56,15 +55,9 @@ class Timer:
                 self._thread.cancel()
 
 
-# ---------------------------------------------------------------------------
-# 2. Doua TimerTask-uri gata de folosit, cu functii diferite
-# ---------------------------------------------------------------------------
-
 class ReminderTask(TimerTask):
     """Task repetitiv: la fiecare 'period' secunde afiseaza un mesaj de
-    reamintire (de ex. 'Bea apa!') si incrementeaza un contor.
-
-    on_tick(count, message) este apelat la fiecare declansare.
+    reamintire si incrementeaza un contor.
     """
 
     def __init__(self, message, on_tick):
@@ -75,7 +68,7 @@ class ReminderTask(TimerTask):
     def run(self):
         self.count += 1
         try:
-            print("\a", end="", flush=True)  # semnal sonor scurt (optional)
+            print("\a", end="", flush=True) 
         except Exception:
             pass
         self.on_tick(self.count, self.message)
