@@ -8,7 +8,7 @@ class CountdownTimer:
   def __init__(self, root):
     self.root = root
     self.root.title("Sistem Multi-Timer")
-    self.root.geometry("450x400")
+    self.root.geometry("450x520")
     self.root.resizable(False, False)
 
     # Stări pentru timere
