@@ -5,78 +5,51 @@ import java.util.TimerTask;
 
 public class FocusCycleTimer extends BaseTimer {
 
-    private int focusSeconds;
-    private int breakSeconds;
+    private int secundeFocus;
+    private int secundePauza;
+    private int secundeRamase;
 
-    private int totalCycles;
-    private int currentCycle;
+    private int totalCicluri;
+    private int ciclulCurent;
 
-    private int remainingSeconds;
+    private boolean esteFocus = true;
+    private boolean estePauzat = false;
+    private boolean pornireAutomata;
 
-    private boolean focusPhase;
-    private boolean paused;
-
-    private boolean autoStart;
-
-    private Runnable onUpdate;
-    private Runnable onFinish;
+    private Runnable actiuneActualizare;
+    private Runnable actiuneFinalizare;
 
 
-    // Constructor
-    public FocusCycleTimer(Runnable onUpdate,
-                           Runnable onFinish) {
+    public FocusCycleTimer(Runnable actiuneActualizare,
+                           Runnable actiuneFinalizare) {
 
-        this.onUpdate = onUpdate;
-        this.onFinish = onFinish;
+        this.actiuneActualizare = actiuneActualizare;
+        this.actiuneFinalizare = actiuneFinalizare;
     }
 
 
-    // Setările complete
-    public void setSettings(
-            int focusMinutes,
-            int breakMinutes,
-            int cycles,
-            boolean autoStart
-    ) {
+    public void setSettings(int minuteFocus,
+                            int minutePauza,
+                            int cicluri,
+                            boolean pornireAutomata) {
 
-        focusSeconds = focusMinutes * 60;
-        breakSeconds = breakMinutes * 60;
+        secundeFocus = minuteFocus * 60;
+        secundePauza = minutePauza * 60;
 
-        totalCycles = cycles;
+        totalCicluri = cicluri;
+        ciclulCurent = 1;
 
-        this.autoStart = autoStart;
+        esteFocus = true;
+        estePauzat = false;
 
-        currentCycle = 1;
+        this.pornireAutomata = pornireAutomata;
 
-        focusPhase = true;
+        secundeRamase = secundeFocus;
 
-        paused = false;
-
-        remainingSeconds = focusSeconds;
-
-        update();
+        actiuneActualizare.run();
     }
 
 
-    // SUPRAÎNCĂRCARE
-    // Dacă nu trimitem autoStart,
-    // acesta va fi true.
-    public void setSettings(
-            int focusMinutes,
-            int breakMinutes,
-            int cycles
-    ) {
-
-        setSettings(
-                focusMinutes,
-                breakMinutes,
-                cycles,
-                true
-        );
-    }
-
-
-    // SUPRASCRIERE
     @Override
     public void start() {
 
@@ -84,211 +57,153 @@ public class FocusCycleTimer extends BaseTimer {
             return;
         }
 
-
-        timer = new Timer(true);
+        timer = new Timer();
 
         running = true;
-        paused = false;
+        estePauzat = false;
 
 
-        TimerTask task = new TimerTask() {
+        TimerTask sarcina = new TimerTask() {
 
             @Override
             public void run() {
 
-                remainingSeconds--;
+                secundeRamase--;
 
-                update();
-
-
-                // Sesiunea s-a terminat
-                if (remainingSeconds <= 0) {
-
-                    nextSession();
+                if (secundeRamase <= 0) {
+                    urmatoareaSesiune();
                 }
+
+                actiuneActualizare.run();
             }
         };
 
 
-        // Task-ul se execută la fiecare secundă.
         timer.scheduleAtFixedRate(
-                task,
+                sarcina,
                 1000,
                 1000
         );
     }
 
 
-    // PAUSE
     public void pause() {
 
-        if (!running) {
-            return;
-        }
-
         stopTimer();
 
-        paused = true;
-
-        update();
+        estePauzat = true;
     }
 
 
-    // SKIP
     public void skip() {
 
-        boolean wasRunning = running;
+        urmatoareaSesiune();
 
-        stopTimer();
-
-        nextSession();
-
-
-        // Dacă timerul mergea înainte de Skip,
-        // pornim sesiunea următoare.
-        if (wasRunning) {
-            start();
-        }
+        actiuneActualizare.run();
     }
 
 
-    // STOP
     public void stop() {
 
         stopTimer();
 
-        paused = false;
+        ciclulCurent = 1;
 
-        currentCycle = 1;
+        esteFocus = true;
+        estePauzat = false;
 
-        focusPhase = true;
+        secundeRamase = secundeFocus;
 
-        remainingSeconds = focusSeconds;
-
-        update();
+        actiuneActualizare.run();
     }
 
 
-    // Trecem la următoarea sesiune.
-    private void nextSession() {
+    private void urmatoareaSesiune() {
 
-        // Dacă eram în Focus,
-        // trecem în Break.
-        if (focusPhase) {
+        if (esteFocus) {
 
-            focusPhase = false;
+            esteFocus = false;
 
-            remainingSeconds = breakSeconds;
+            secundeRamase = secundePauza;
 
         } else {
 
-            // Dacă am terminat toate ciclurile
-            if (currentCycle >= totalCycles) {
+            ciclulCurent++;
 
-                finish();
+            if (ciclulCurent > totalCicluri) {
+
+                stopTimer();
+
+                secundeRamase = 0;
+
+                actiuneFinalizare.run();
 
                 return;
             }
 
+            esteFocus = true;
 
-            // Trecem la ciclul următor.
-            currentCycle++;
-
-            focusPhase = true;
-
-            remainingSeconds = focusSeconds;
+            secundeRamase = secundeFocus;
         }
 
 
-        update();
-
-
-        // Dacă Auto-start nu este bifat,
-        // ne oprim între sesiuni.
-        if (!autoStart) {
+        if (!pornireAutomata) {
 
             stopTimer();
 
-            paused = true;
+            estePauzat = true;
         }
     }
 
-
-    // Final
-    private void finish() {
-
-        stopTimer();
-
-        paused = false;
-
-        remainingSeconds = 0;
-
-        update();
-
-
-        if (onFinish != null) {
-            onFinish.run();
-        }
-    }
-
-
-    // Actualizăm interfața.
-    private void update() {
-
-        if (onUpdate != null) {
-            onUpdate.run();
-        }
-    }
-
-
-    // GETTERS
 
     public int getRemainingSeconds() {
-        return remainingSeconds;
+
+        return secundeRamase;
     }
 
 
     public int getCurrentCycle() {
-        return currentCycle;
+
+        return ciclulCurent;
     }
 
 
     public int getTotalCycles() {
-        return totalCycles;
+
+        return totalCicluri;
     }
 
 
     public boolean isFocusPhase() {
-        return focusPhase;
+
+        return esteFocus;
     }
 
 
     public boolean isPaused() {
-        return paused;
+
+        return estePauzat;
     }
 
 
     public String getPhaseText() {
 
-        if (focusPhase) {
+        if (esteFocus) {
             return "FOCUS TIME";
-        } else {
-            return "BREAK TIME";
         }
+
+        return "BREAK TIME";
     }
 
 
-    // Transformă secundele:
-    // 1500 secunde -> 25:00
-    public static String formatTime(int seconds) {
+    public static String formatTime(int secunde) {
 
-        int minutes = seconds / 60;
-
-        int sec = seconds % 60;
+        int minute = secunde / 60;
+        int sec = secunde % 60;
 
         return String.format(
                 "%02d:%02d",
-                minutes,
+                minute,
                 sec
         );
     }
