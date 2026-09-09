@@ -1,0 +1,869 @@
+/* =========================================================
+   SMART TIMER MANAGER - FINAL UNIFIED DESIGN
+   4 TIMERS / SAME VISUAL STYLE
+   ========================================================= */
+
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #f3f6fb;
+}
+
+/* SIDEBAR */
+.sidebar {
+    -fx-pref-width: 205px;
+    -fx-min-width: 205px;
+    -fx-max-width: 205px;
+    -fx-background-color: #17243d;
+    -fx-padding: 20px 14px 18px 14px;
+    -fx-spacing: 10px;
+    -fx-alignment: TOP_CENTER;
+}
+.sidebar-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+.sidebar-subtitle {
+    -fx-font-size: 10px;
+    -fx-text-fill: #afbdd2;
+}
+.sidebar .separator .line {
+    -fx-border-color: #35445e;
+}
+.sidebar-button {
+    -fx-pref-width: 175px;
+    -fx-pref-height: 38px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 9px;
+    -fx-text-fill: #e9eef7;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8px 14px;
+    -fx-cursor: hand;
+}
+.sidebar-button:hover {
+    -fx-background-color: #293d60;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    -fx-padding: 10px 14px 18px 14px;
+    -fx-spacing: 10px;
+    -fx-alignment: TOP_CENTER;
+    -fx-background-color: #f3f6fb;
+}
+
+/* HEADER */
+.header {
+    -fx-pref-height: 50px;
+    -fx-min-height: 50px;
+    -fx-max-height: 50px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0px 4px;
+}
+.header-text {
+    -fx-spacing: 2px;
+    -fx-alignment: CENTER_LEFT;
+}
+.header-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+}
+.header-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #66758f;
+}
+
+/* GRID */
+.timer-grid {
+    -fx-hgap: 14px;
+    -fx-vgap: 14px;
+    -fx-padding: 0px;
+    -fx-alignment: TOP_CENTER;
+}
+
+/* ALL CARDS - SAME SIZE */
+.timer-card,
+.focus-card,
+.persistent-card {
+    -fx-pref-width: 500px;
+    -fx-min-width: 500px;
+    -fx-max-width: 500px;
+
+    -fx-pref-height: 345px;
+    -fx-min-height: 345px;
+    -fx-max-height: 345px;
+
+    -fx-background-color: white;
+    -fx-background-radius: 17px;
+    -fx-border-color: #dce5f1;
+    -fx-border-radius: 17px;
+    -fx-border-width: 1px;
+
+    -fx-padding: 12px 18px;
+    -fx-spacing: 4px;
+    -fx-alignment: TOP_CENTER;
+
+    -fx-translate-x: 0px;
+    -fx-translate-y: 0px;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(27,45,75,0.10),
+            13,
+            0.12,
+            0,
+            3
+    );
+}
+
+/* COMMON TITLES */
+.timer-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+.timer-description {
+    -fx-font-size: 10px;
+    -fx-text-fill: #66758f;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+/* COMMON TIMER DISPLAY */
+.timer-display {
+    -fx-pref-width: 320px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 1px;
+    -fx-padding: 4px 0px 3px 0px;
+}
+.timer-time {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+.timer-caption {
+    -fx-font-size: 10px;
+    -fx-text-fill: #61708c;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+/* COMMON LABELS */
+.section-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16294d;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-padding: 1px 0px 0px 0px;
+}
+
+/* COMMON INPUT ROW */
+.duration-row {
+    -fx-alignment: CENTER;
+    -fx-spacing: 6px;
+    -fx-padding: 0px;
+}
+.time-input {
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+    -fx-pref-height: 29px;
+    -fx-min-height: 29px;
+    -fx-max-height: 29px;
+    -fx-alignment: CENTER;
+    -fx-font-size: 11px;
+    -fx-text-fill: #15213a;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+}
+.time-input:focused {
+    -fx-border-color: #5687ec;
+}
+.time-unit {
+    -fx-font-size: 10px;
+    -fx-text-fill: #44536d;
+}
+
+/* COMMON SESSION / TASK */
+.session-section {
+    -fx-alignment: CENTER;
+    -fx-spacing: 2px;
+    -fx-padding: 0px;
+}
+.session-input {
+    -fx-pref-width: 310px;
+    -fx-min-width: 310px;
+    -fx-max-width: 310px;
+    -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px 8px;
+    -fx-font-size: 11px;
+    -fx-text-fill: #1b2942;
+}
+.session-input:focused {
+    -fx-border-color: #5687ec;
+}
+
+/* COMBOBOX */
+.action-combo {
+    -fx-pref-width: 310px;
+    -fx-min-width: 310px;
+    -fx-max-width: 310px;
+    -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+}
+.action-combo .list-cell {
+    -fx-font-size: 11px;
+    -fx-text-fill: #25344e;
+}
+.action-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* STATUS */
+.status-section {
+    -fx-alignment: CENTER;
+    -fx-spacing: 0px;
+    -fx-padding: 0px;
+}
+.status-ready {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #19a568;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+/* COMMON BUTTONS */
+.timer-buttons {
+    -fx-alignment: CENTER;
+    -fx-spacing: 10px;
+    -fx-padding: 4px 0px 0px 0px;
+    -fx-pref-height: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+}
+.timer-button {
+    -fx-pref-width: 100px;
+    -fx-min-width: 100px;
+    -fx-max-width: 100px;
+    -fx-pref-height: 31px;
+    -fx-min-height: 31px;
+    -fx-max-height: 31px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.start-button {
+    -fx-background-color: #21a66c;
+    -fx-text-fill: white;
+}
+.start-button:hover {
+    -fx-background-color: #198957;
+}
+.pause-button {
+    -fx-background-color: #e8eef8;
+    -fx-text-fill: #2e4163;
+}
+.pause-button:hover {
+    -fx-background-color: #d9e4f3;
+}
+.cancel-button {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #bd261d;
+}
+.cancel-button:hover {
+    -fx-background-color: #fecaca;
+}
+
+/* TIMER 1 */
+#countdownTimeLabel {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+}
+#countdownStatusLabel {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #19a568;
+}
+
+/* TIMER 2 */
+#exactTimeLabel {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+}
+#exactHourField,
+#exactMinuteField,
+#exactSecondField {
+    -fx-pref-width: 50px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+    -fx-pref-height: 29px;
+    -fx-min-height: 29px;
+    -fx-max-height: 29px;
+    -fx-alignment: CENTER;
+}
+#exactTaskField,
+#exactActionComboBox {
+    -fx-pref-width: 310px;
+    -fx-min-width: 310px;
+    -fx-max-width: 310px;
+    -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+}
+#exactStatusLabel {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #19a568;
+}
+#scheduleExactButton,
+#cancelExactButton {
+    -fx-pref-width: 115px;
+    -fx-min-width: 115px;
+    -fx-max-width: 115px;
+    -fx-pref-height: 31px;
+    -fx-min-height: 31px;
+    -fx-max-height: 31px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+#scheduleExactButton {
+    -fx-background-color: #21a66c;
+    -fx-text-fill: white;
+}
+#scheduleExactButton:hover {
+    -fx-background-color: #198957;
+}
+#cancelExactButton {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #bd261d;
+}
+#cancelExactButton:hover {
+    -fx-background-color: #fecaca;
+}
+
+/* TIMER 3 */
+.focus-card {
+    -fx-padding: 12px 16px;
+    -fx-spacing: 4px;
+}
+
+.focus-card .timer-display {
+    -fx-pref-width: 340px;
+    -fx-pref-height: 100px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 1px;
+    -fx-padding: 4px 0px 2px 0px;
+}
+#focusTimeLabel {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102347;
+}
+#focusPhaseLabel {
+    -fx-font-size: 9px;
+    -fx-text-fill: #61708c;
+}
+#focusCycleLabel {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16294d;
+}
+.focus-progress {
+    -fx-pref-width: 280px;
+    -fx-min-width: 280px;
+    -fx-max-width: 280px;
+    -fx-pref-height: 9px;
+    -fx-min-height: 9px;
+    -fx-max-height: 9px;
+}
+.focus-progress .track {
+    -fx-background-color: #e3e9f2;
+    -fx-background-radius: 7px;
+    -fx-background-insets: 0px;
+}
+.focus-progress .bar {
+    -fx-background-color: #5687ec;
+    -fx-background-radius: 7px;
+    -fx-background-insets: 0px;
+}
+.focus-settings {
+    -fx-pref-width: 455px;
+    -fx-min-width: 455px;
+    -fx-max-width: 455px;
+    -fx-pref-height: 64px;
+    -fx-min-height: 64px;
+    -fx-max-height: 64px;
+    -fx-alignment: TOP_CENTER;
+    -fx-spacing: 5px;
+    -fx-padding: 2px 0px 0px 0px;
+}
+.focus-setting-box {
+    -fx-pref-width: 75px;
+    -fx-min-width: 75px;
+    -fx-max-width: 75px;
+    -fx-pref-height: 60px;
+    -fx-min-height: 60px;
+    -fx-max-height: 60px;
+    -fx-alignment: TOP_CENTER;
+    -fx-spacing: 4px;
+}
+.focus-setting-box > .label {
+    -fx-pref-width: 75px;
+    -fx-min-width: 75px;
+    -fx-max-width: 75px;
+    -fx-font-size: 8px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16294d;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-text-overrun: CLIP;
+}
+.focus-setting-box > HBox {
+    -fx-pref-width: 75px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 3px;
+}
+#focusMinutesField,
+#breakMinutesField,
+.focus-setting-input {
+    -fx-pref-width: 44px;
+    -fx-min-width: 44px;
+    -fx-max-width: 44px;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-alignment: CENTER;
+    -fx-font-size: 9px;
+    -fx-text-fill: #15213a;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+}
+#focusMinutesField:focused,
+#breakMinutesField:focused {
+    -fx-border-color: #5687ec;
+}
+.focus-setting-box > HBox > .label {
+    -fx-font-size: 8px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #44536d;
+    -fx-padding: 0px;
+}
+.focus-settings > .label {
+    -fx-pref-width: 82px;
+    -fx-min-width: 82px;
+    -fx-max-width: 82px;
+    -fx-pref-height: 18px;
+    -fx-min-height: 18px;
+    -fx-max-height: 18px;
+    -fx-font-size: 8px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16294d;
+    -fx-wrap-text: false;
+    -fx-text-overrun: CLIP;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-padding: 0px;
+}
+#focusCyclesField,
+.focus-cycle-input {
+    -fx-pref-width: 42px;
+    -fx-min-width: 42px;
+    -fx-max-width: 42px;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-alignment: CENTER;
+    -fx-font-size: 9px;
+    -fx-text-fill: #15213a;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+    -fx-translate-x: -67px;
+    -fx-translate-y: 24px;
+}
+#focusCyclesField:focused {
+    -fx-border-color: #5687ec;
+}
+#autoStartCheckBox,
+.focus-checkbox {
+    -fx-pref-width: 105px;
+    -fx-min-width: 105px;
+    -fx-max-width: 105px;
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+    -fx-font-size: 8px;
+    -fx-text-fill: #344764;
+    -fx-wrap-text: true;
+    -fx-text-overrun: CLIP;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0px;
+    -fx-translate-x: -32px;
+    -fx-translate-y: 11px;
+}
+#autoStartCheckBox .box,
+.focus-checkbox .box {
+    -fx-pref-width: 14px;
+    -fx-min-width: 14px;
+    -fx-max-width: 14px;
+    -fx-pref-height: 14px;
+    -fx-min-height: 14px;
+    -fx-max-height: 14px;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 3px;
+    -fx-border-color: #b9c6d8;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-padding: 0px;
+}
+.focus-settings > .status-section {
+    -fx-pref-width: 65px;
+    -fx-min-width: 65px;
+    -fx-max-width: 65px;
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 2px;
+    -fx-padding: 0px;
+    -fx-translate-x: -27px;
+    -fx-translate-y: 8px;
+}
+.focus-settings > .status-section > .section-label {
+    -fx-pref-width: 65px;
+    -fx-min-width: 65px;
+    -fx-max-width: 65px;
+    -fx-font-size: 8px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16294d;
+    -fx-text-overrun: CLIP;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-padding: 0px;
+}
+#focusStatusLabel {
+    -fx-pref-width: 65px;
+    -fx-min-width: 65px;
+    -fx-max-width: 65px;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #19a568;
+    -fx-text-overrun: CLIP;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+.focus-buttons {
+    -fx-pref-width: 455px;
+    -fx-min-width: 455px;
+    -fx-max-width: 455px;
+    -fx-pref-height: 33px;
+    -fx-min-height: 33px;
+    -fx-max-height: 33px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 8px;
+    -fx-padding: 2px 0px 0px 0px;
+}
+.focus-buttons > .button,
+.focus-button {
+    -fx-pref-width: 105px;
+    -fx-min-width: 105px;
+    -fx-max-width: 105px;
+    -fx-pref-height: 29px;
+    -fx-min-height: 29px;
+    -fx-max-height: 29px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+#startFocusButton,
+.focus-start {
+    -fx-background-color: #21a66c;
+    -fx-text-fill: white;
+}
+#startFocusButton:hover,
+.focus-start:hover {
+    -fx-background-color: #198957;
+}
+#pauseFocusButton,
+.focus-pause {
+    -fx-background-color: #e8eef8;
+    -fx-text-fill: #2e4163;
+}
+#pauseFocusButton:hover,
+.focus-pause:hover {
+    -fx-background-color: #d9e4f3;
+}
+#skipFocusButton,
+.focus-skip {
+    -fx-background-color: #fff1c7;
+    -fx-text-fill: #8a6500;
+}
+#skipFocusButton:hover,
+.focus-skip:hover {
+    -fx-background-color: #ffe6a3;
+}
+#stopFocusButton,
+.focus-stop {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #bd261d;
+}
+#stopFocusButton:hover,
+.focus-stop:hover {
+    -fx-background-color: #fecaca;
+}
+
+/* =========================================================
+   TIMER 4 - PERIODIC REMINDER CLOCK
+   ========================================================= */
+
+.persistent-card {
+    -fx-padding: 12px 18px;
+    -fx-spacing: 4px;
+    -fx-alignment: TOP_CENTER;
+}
+
+
+/* =========================================================
+   ORA REALA
+   ========================================================= */
+
+.persistent-card .timer-display {
+    -fx-pref-width: 340px;
+
+    -fx-pref-height: 80px;
+    -fx-min-height: 80px;
+    -fx-max-height: 80px;
+
+    -fx-alignment: CENTER;
+    -fx-spacing: 1px;
+
+    -fx-padding: 6px 0px 2px 0px;
+}
+
+
+#persistentTimeLabel {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+
+    -fx-text-fill: #102347;
+
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+
+/* =========================================================
+   SECTIUNEA REMINDER
+   ========================================================= */
+
+.persistent-reminder-section {
+    -fx-pref-width: 340px;
+
+    -fx-alignment: CENTER;
+
+    -fx-spacing: 4px;
+
+    -fx-padding: 2px 0px 0px 0px;
+}
+
+
+/* =========================================================
+   REMINDER EVERY [5] MIN
+   ========================================================= */
+
+.persistent-reminder-row {
+    -fx-alignment: CENTER;
+
+    -fx-spacing: 6px;
+
+    -fx-padding: 0px;
+}
+
+
+.reminder-input {
+    -fx-pref-width: 55px;
+    -fx-min-width: 55px;
+    -fx-max-width: 55px;
+
+    -fx-pref-height: 29px;
+    -fx-min-height: 29px;
+    -fx-max-height: 29px;
+
+    -fx-alignment: CENTER;
+
+    -fx-font-size: 11px;
+    -fx-text-fill: #15213a;
+
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 7px;
+
+    -fx-border-color: #cbd7e7;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+}
+
+
+.reminder-input:focused {
+    -fx-border-color: #5687ec;
+}
+
+
+.reminder-unit {
+    -fx-font-size: 10px;
+    -fx-text-fill: #44536d;
+}
+
+
+/* =========================================================
+   NEXT REMINDER
+   ========================================================= */
+
+.next-reminder-section {
+    -fx-alignment: CENTER;
+
+    -fx-spacing: 0px;
+
+    -fx-padding: 1px 0px 0px 0px;
+}
+
+
+#reminderCountdownLabel {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+
+    -fx-text-fill: #102347;
+
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+#reminderStatusLabel {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+
+    -fx-text-fill: #19a568;
+
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+
+    -fx-padding: 1px 0px;
+}
+
+
+/* =========================================================
+   BUTOANE TIMER 4
+   ========================================================= */
+
+.persistent-buttons {
+    -fx-pref-width: 340px;
+    -fx-min-width: 340px;
+    -fx-max-width: 340px;
+
+    -fx-pref-height: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+
+    -fx-alignment: CENTER;
+
+    -fx-spacing: 12px;
+
+    -fx-padding: 4px 0px 0px 0px;
+}
+
+
+/* TOATE BUTOANELE */
+
+.persistent-button {
+    -fx-pref-width: 100px;
+    -fx-min-width: 100px;
+    -fx-max-width: 100px;
+
+    -fx-pref-height: 31px;
+    -fx-min-height: 31px;
+    -fx-max-height: 31px;
+
+    -fx-background-radius: 8px;
+
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+
+    -fx-cursor: hand;
+}
+
+
+/* START */
+
+.persistent-start {
+    -fx-background-color: #21a66c;
+    -fx-text-fill: white;
+}
+
+.persistent-start:hover {
+    -fx-background-color: #198957;
+}
+
+
+/* PAUSE */
+
+.persistent-pause {
+    -fx-background-color: #e8eef8;
+    -fx-text-fill: #2e4163;
+}
+
+.persistent-pause:hover {
+    -fx-background-color: #d9e4f3;
+}
+
+
+/* RESET */
+
+.persistent-reset {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #bd261d;
+}
+
+.persistent-reset:hover {
+    -fx-background-color: #fecaca;
+}s

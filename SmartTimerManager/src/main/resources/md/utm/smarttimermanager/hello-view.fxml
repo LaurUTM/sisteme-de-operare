@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="900.0" prefWidth="1280.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="md.utm.smarttimermanager.HelloController">
+
+
+   <!-- ===================================================== -->
+   <!-- SIDEBAR -->
+   <!-- ===================================================== -->
+
+   <left>
+
+      <VBox styleClass="sidebar">
+
+         <children>
+
+            <Label styleClass="sidebar-title" text="SMART TIMER MANAGER" />
+
+            <Label styleClass="sidebar-subtitle" text="Plan. Run. Track. Efficiently." />
+
+            <Separator />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Home" />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Timers" />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Presets" />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Statistics" />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Settings" />
+
+            <Button mnemonicParsing="false" styleClass="sidebar-button" text="Help" />
+
+         </children>
+
+      </VBox>
+
+   </left>
+
+
+   <!-- ===================================================== -->
+   <!-- MAIN CONTENT -->
+   <!-- ===================================================== -->
+
+   <center>
+
+      <VBox styleClass="main-content">
+
+         <children>
+
+
+            <!-- ================================================= -->
+            <!-- HEADER -->
+            <!-- ================================================= -->
+
+            <HBox styleClass="header">
+
+               <children>
+
+                  <VBox styleClass="header-text">
+
+                     <children>
+
+                        <Label styleClass="header-title" text="Smart Timer Manager" />
+
+                        <Label styleClass="header-subtitle" text="Manage your time, boost your productivity!" />
+
+                     </children>
+
+                  </VBox>
+
+               </children>
+
+            </HBox>
+
+
+            <!-- ================================================= -->
+            <!-- GRID - 4 TIMERE -->
+            <!-- ================================================= -->
+
+            <GridPane styleClass="timer-grid">
+
+               <columnConstraints>
+
+                  <ColumnConstraints percentWidth="50.0" />
+
+                  <ColumnConstraints percentWidth="50.0" />
+
+               </columnConstraints>
+
+
+               <rowConstraints>
+
+                  <RowConstraints />
+
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+
+               </rowConstraints>
+
+
+               <children>
+
+
+                  <!-- ================================================= -->
+                  <!-- TIMER 1 - COUNTDOWN -->
+                  <!-- ================================================= -->
+
+                  <VBox styleClass="timer-card" GridPane.columnIndex="0">
+
+                     <children>
+
+
+                        <!-- TITLE -->
+
+                        <Label styleClass="timer-title" text="COUNTDOWN TIMER" />
+
+                        <Label styleClass="timer-description" text="Run a timer for a specific duration." />
+
+
+                        <!-- CURRENT TIME DISPLAY -->
+
+                        <VBox styleClass="timer-display">
+
+                           <children>
+
+                              <Label fx:id="countdownTimeLabel" styleClass="timer-time" text="00:25:00" />
+
+                              <Label styleClass="timer-caption" text="Remaining" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- DURATION -->
+
+                        <Label styleClass="section-label" text="Duration" />
+
+
+                        <HBox styleClass="duration-row">
+
+                           <children>
+
+                              <TextField fx:id="countdownHoursField" styleClass="time-input" text="0" />
+
+                              <Label styleClass="time-unit" text="h" />
+
+
+                              <TextField fx:id="countdownMinutesField" styleClass="time-input" text="25" />
+
+                              <Label styleClass="time-unit" text="min" />
+
+
+                              <TextField fx:id="countdownSecondsField" styleClass="time-input" text="0" />
+
+                              <Label styleClass="time-unit" text="sec" />
+
+                           </children>
+
+                        </HBox>
+
+
+                        <!-- SESSION NAME -->
+
+                        <VBox styleClass="session-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Session name" />
+
+                              <TextField fx:id="countdownNameField" promptText="Study session" styleClass="session-input" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- STATUS -->
+
+                        <VBox styleClass="status-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Status" />
+
+                              <Label fx:id="countdownStatusLabel" styleClass="status-ready" text="● Ready" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- BUTTONS -->
+
+                        <HBox styleClass="timer-buttons">
+
+                           <children>
+
+
+                              <Button fx:id="startCountdownButton" mnemonicParsing="false" onAction="#startCountdown" text="Start">
+
+                                 <styleClass>
+
+                                    <String fx:value="timer-button" />
+
+                                    <String fx:value="start-button" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                              <Button fx:id="pauseCountdownButton" mnemonicParsing="false" onAction="#pauseCountdown" text="Pause">
+
+                                 <styleClass>
+
+                                    <String fx:value="timer-button" />
+
+                                    <String fx:value="pause-button" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                              <Button fx:id="cancelCountdownButton" mnemonicParsing="false" onAction="#cancelCountdown" text="Cancel">
+
+                                 <styleClass>
+
+                                    <String fx:value="timer-button" />
+
+                                    <String fx:value="cancel-button" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                           </children>
+
+                        </HBox>
+
+
+                     </children>
+
+                  </VBox>
+
+
+                  <!-- ================================================= -->
+                  <!-- TIMER 2 - SCHEDULED TASK ALARM -->
+                  <!-- ================================================= -->
+
+                  <VBox styleClass="timer-card" GridPane.columnIndex="1">
+
+                     <children>
+
+
+                        <!-- TITLE -->
+
+                        <Label styleClass="timer-title" text="SCHEDULED TASK ALARM" />
+
+                        <Label styleClass="timer-description" text="Execute a task at an exact time." />
+
+
+                        <!-- SCHEDULED TIME DISPLAY -->
+
+                        <VBox styleClass="timer-display">
+
+                           <children>
+
+                              <Label fx:id="exactTimeLabel" styleClass="timer-time" text="14:30:00" />
+
+                              <Label styleClass="timer-caption" text="Scheduled time" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- TIME -->
+
+                        <Label styleClass="section-label" text="Time" />
+
+
+                        <HBox styleClass="duration-row">
+
+                           <children>
+
+
+                              <TextField fx:id="exactHourField" styleClass="time-input" text="14" />
+
+                              <Label styleClass="time-unit" text=":" />
+
+
+                              <TextField fx:id="exactMinuteField" styleClass="time-input" text="30" />
+
+                              <Label styleClass="time-unit" text=":" />
+
+
+                              <TextField fx:id="exactSecondField" styleClass="time-input" text="00" />
+
+
+                           </children>
+
+                        </HBox>
+
+
+                        <!-- TASK -->
+
+                        <VBox styleClass="session-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Task" />
+
+                              <TextField fx:id="exactTaskField" promptText="Upload laboratory" styleClass="session-input" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- ACTION -->
+
+                        <VBox styleClass="session-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Action" />
+
+                              <ComboBox fx:id="exactActionComboBox" promptText="Select action" styleClass="action-combo" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- STATUS -->
+
+                        <VBox styleClass="status-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Status" />
+
+                              <Label fx:id="exactStatusLabel" styleClass="status-ready" text="● Waiting" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- BUTTONS -->
+
+                        <HBox styleClass="timer-buttons">
+
+                           <children>
+
+
+                              <Button fx:id="scheduleExactButton" mnemonicParsing="false" onAction="#scheduleExact" text="Schedule">
+
+                                 <styleClass>
+
+                                    <String fx:value="timer-button" />
+
+                                    <String fx:value="start-button" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                              <Button fx:id="cancelExactButton" mnemonicParsing="false" onAction="#cancelExact" text="Cancel">
+
+                                 <styleClass>
+
+                                    <String fx:value="timer-button" />
+
+                                    <String fx:value="cancel-button" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                           </children>
+
+                        </HBox>
+
+
+                     </children>
+
+                  </VBox>
+                  <VBox maxHeight="346.0" maxWidth="578.0" minHeight="341.0" prefHeight="341.0" prefWidth="578.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label styleClass="timer-title" text="SMART FOCUS CYCLE" />
+                        <Label styleClass="timer-description" text="Alternate focus and break sessions." />
+                        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="timer-display">
+                           <children>
+                              <Label fx:id="focusTimeLabel" styleClass="timer-time" text="25:00" />
+                              <Label fx:id="focusPhaseLabel" styleClass="timer-caption" text="FOCUS TIME" />
+                              <Label fx:id="focusCycleLabel" styleClass="section-label" text="Cycle 1 of 4" />
+                              <ProgressBar fx:id="focusProgressBar" prefWidth="200.0" progress="0.0" styleClass="focus-progress" />
+                           </children>
+                        </VBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" styleClass="focus-settings">
+                           <children>
+                              <VBox prefHeight="200.0" prefWidth="100.0" styleClass="focus-setting-box">
+                                 <children>
+                                    <Label text="Focus duration" />
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <TextField fx:id="focusMinutesField" styleClass="focus-setting-input" text="25" />
+                                          <Label text="min" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="200.0" prefWidth="100.0" styleClass="focus-setting-box">
+                                 <children>
+                                    <Label text="Break duration" />
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <TextField fx:id="breakMinutesField" styleClass="focus-setting-input" text="5" />
+                                          <Label text="min" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Label styleClass="section-label" text="Number of cycles" />
+                              <TextField fx:id="focusCyclesField" styleClass="focus-cycle-input" text="4" />
+                              <CheckBox fx:id="autoStartCheckBox" mnemonicParsing="false" styleClass="focus-checkbox" text="Auto-start next session" />
+                              <VBox prefHeight="200.0" prefWidth="100.0" styleClass="status-section">
+                                 <children>
+                                    <Label prefHeight="15.0" prefWidth="34.0" styleClass="section-label" text="Status" />
+                                    <Label fx:id="focusStatusLabel" prefHeight="14.0" prefWidth="36.0" styleClass="status-ready" text="● Ready" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" styleClass="focus-buttons">
+                           <children>
+                              <Button fx:id="startFocusButton" mnemonicParsing="false" onAction="#startFocus" text="Start">
+                                 <styleClass>
+                                    <String fx:value="focus-button" />
+                                    <String fx:value="focus-start" />
+                                 </styleClass>
+                              </Button>
+                              <Button fx:id="pauseFocusButton" mnemonicParsing="false" onAction="#pauseFocus" text="Pause">
+                                 <styleClass>
+                                    <String fx:value="focus-button" />
+                                    <String fx:value="focus-pause" />
+                                 </styleClass>
+                              </Button>
+                              <Button fx:id="skipFocusButton" mnemonicParsing="false" onAction="#skipFocus" text="Skip">
+                                 <styleClass>
+                                    <String fx:value="focus-button" />
+                                    <String fx:value="focus-skip" />
+                                 </styleClass>
+                              </Button>
+                              <Button fx:id="stopFocusButton" mnemonicParsing="false" onAction="#stopFocus" text="Stop">
+                                 <styleClass>
+                                    <String fx:value="focus-button" />
+                                    <String fx:value="focus-stop" />
+                                 </styleClass>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                     <styleClass>
+                        <String fx:value="timer-card" />
+                        <String fx:value="focus-card" />
+                     </styleClass>
+                  </VBox>
+                  <VBox prefHeight="345.0" prefWidth="500.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <styleClass>
+                        <String fx:value="timer-card" />
+                        <String fx:value="persistent-card" />
+                     </styleClass>
+
+                     <children>
+
+                        <Label styleClass="timer-title" text="PERIODIC REMINDER CLOCK" />
+
+                        <Label styleClass="timer-description" text="Current time with automatic reminders." />
+
+
+                        <!-- CURRENT SYSTEM TIME -->
+
+                        <VBox styleClass="timer-display">
+
+                           <children>
+
+                              <Label fx:id="persistentTimeLabel" styleClass="timer-time" text="00:00:00" />
+
+                              <Label styleClass="timer-caption" text="CURRENT TIME" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- REMINDER SETTINGS -->
+
+                        <VBox styleClass="persistent-reminder-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Reminder every" />
+
+                              <HBox styleClass="persistent-reminder-row">
+
+                                 <children>
+
+                                    <TextField fx:id="reminderMinutesField" styleClass="reminder-input" text="5" />
+
+                                    <Label styleClass="reminder-unit" text="min" />
+
+                                 </children>
+
+                              </HBox>
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- NEXT REMINDER -->
+
+                        <VBox styleClass="next-reminder-section">
+
+                           <children>
+
+                              <Label styleClass="section-label" text="Next reminder in" />
+
+                              <Label fx:id="reminderCountdownLabel" text="05:00" />
+
+                              <Label fx:id="reminderStatusLabel" styleClass="status-ready" text="● Ready" />
+
+                           </children>
+
+                        </VBox>
+
+
+                        <!-- BUTTONS -->
+
+                        <HBox styleClass="persistent-buttons">
+
+                           <children>
+
+                              <Button fx:id="startPersistentButton" mnemonicParsing="false" onAction="#startPersistent" text="Start">
+
+                                 <styleClass>
+
+                                    <String fx:value="persistent-button" />
+
+                                    <String fx:value="persistent-start" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                              <Button fx:id="pausePersistentButton" mnemonicParsing="false" onAction="#pausePersistent" text="Pause">
+
+                                 <styleClass>
+
+                                    <String fx:value="persistent-button" />
+
+                                    <String fx:value="persistent-pause" />
+
+                                 </styleClass>
+
+                              </Button>
+
+
+                              <Button fx:id="resetPersistentButton" mnemonicParsing="false" onAction="#resetPersistent" text="Reset">
+
+                                 <styleClass>
+
+                                    <String fx:value="persistent-button" />
+
+                                    <String fx:value="persistent-reset" />
+
+                                 </styleClass>
+
+                              </Button>
+
+                           </children>
+
+                        </HBox>
+
+                     </children>
+
+                  </VBox>
+
+
+               </children>
+
+            </GridPane>
+
+
+         </children>
+
+      </VBox>
+
+   </center>
+
+
+</BorderPane>
