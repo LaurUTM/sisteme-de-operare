@@ -7,31 +7,25 @@ import java.util.TimerTask;
 
 public class PersistentStopwatch extends BaseTimer {
 
-    private String currentTime;
+    private String oraCurenta;
 
-    private int intervalSeconds = 300;
-    private int remainingSeconds = 300;
-    private int configuredMinutes = 5;
+    private int timpRamas = 300;
+    private int interval = 300;
 
-    private boolean reminderRunning = false;
+    private boolean reminderPornit = false;
 
-    private Runnable updateAction;
-    private Runnable reminderAction;
+    private Runnable actualizare;
+    private Runnable reminder;
 
 
-    public PersistentStopwatch(
-            Runnable updateAction,
-            Runnable reminderAction
-    ) {
+    public PersistentStopwatch(Runnable actualizare,
+                               Runnable reminder) {
 
-        this.updateAction = updateAction;
-        this.reminderAction = reminderAction;
-
-        updateCurrentTime();
+        this.actualizare = actualizare;
+        this.reminder = reminder;
     }
 
 
-    // PORNEȘTE CEASUL REAL
     @Override
     public void start() {
 
@@ -39,147 +33,93 @@ public class PersistentStopwatch extends BaseTimer {
             return;
         }
 
-        timer = new Timer(true);
+        timer = new Timer();
         running = true;
 
-
-        TimerTask task = new TimerTask() {
+        TimerTask sarcina = new TimerTask() {
 
             @Override
             public void run() {
 
-                // actualizăm ora
-                updateCurrentTime();
+                LocalTime ora = LocalTime.now();
+
+                oraCurenta =
+                        ora.format(
+                                DateTimeFormatter.ofPattern("HH:mm:ss")
+                        );
 
 
-                // reminderul scade doar dacă a fost apăsat Start
-                if (reminderRunning) {
+                if (reminderPornit) {
 
-                    remainingSeconds--;
+                    timpRamas--;
 
+                    if (timpRamas <= 0) {
 
-                    // dacă a ajuns la 0
-                    if (remainingSeconds <= 0) {
+                        reminder.run();
 
-                        if (reminderAction != null) {
-                            reminderAction.run();
-                        }
-
-
-                        // se reprogramează automat
-                        remainingSeconds = intervalSeconds;
+                        timpRamas = interval;
                     }
                 }
 
 
-                // actualizăm interfața
-                if (updateAction != null) {
-                    updateAction.run();
-                }
+                actualizare.run();
             }
         };
 
 
         timer.scheduleAtFixedRate(
-                task,
+                sarcina,
                 0,
                 1000
         );
     }
 
 
-    // setează numărul de minute
-    public void setReminderMinutes(int minutes) {
+    public void setReminderMinutes(int minute) {
 
-        if (minutes <= 0) {
-            return;
-        }
+        interval = minute * 60;
 
-
-        // resetăm timpul doar dacă utilizatorul
-        // a schimbat numărul de minute
-        if (minutes != configuredMinutes) {
-
-            configuredMinutes = minutes;
-
-            intervalSeconds =
-                    minutes * 60;
-
-            remainingSeconds =
-                    intervalSeconds;
-        }
+        timpRamas = interval;
     }
 
 
-    // START REMINDER
     public void startReminder() {
 
-        reminderRunning = true;
+        reminderPornit = true;
     }
 
 
-    // PAUSE REMINDER
     public void pauseReminder() {
 
-        reminderRunning = false;
+        reminderPornit = false;
     }
 
 
-    // RESET REMINDER
     public void resetReminder() {
 
-        reminderRunning = false;
+        reminderPornit = false;
 
-        remainingSeconds =
-                intervalSeconds;
-    }
-
-
-    private void updateCurrentTime() {
-
-        LocalTime time =
-                LocalTime.now();
-
-        DateTimeFormatter format =
-                DateTimeFormatter.ofPattern(
-                        "HH:mm:ss"
-                );
-
-        currentTime =
-                time.format(format);
+        timpRamas = interval;
     }
 
 
     public String getCurrentTime() {
 
-        return currentTime;
-    }
-
-
-    public int getRemainingSeconds() {
-
-        return remainingSeconds;
-    }
-
-
-    public boolean isReminderRunning() {
-
-        return reminderRunning;
+        return oraCurenta;
     }
 
 
     public String getFormattedRemainingTime() {
 
-        int minutes =
-                remainingSeconds / 60;
+        int minute = timpRamas / 60;
 
-        int seconds =
-                remainingSeconds % 60;
+        int secunde = timpRamas % 60;
+
 
         return String.format(
                 "%02d:%02d",
-                minutes,
-                seconds
+                minute,
+                secunde
         );
     }
 }
