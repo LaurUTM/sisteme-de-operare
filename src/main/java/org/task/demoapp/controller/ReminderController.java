@@ -46,7 +46,7 @@ public class ReminderController {
 
         reminderHourSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                        0, 23, 12
+                        0, 23, 0
                 )
         );
 
