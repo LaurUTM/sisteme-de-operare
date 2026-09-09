@@ -9,7 +9,7 @@ from timer_lab import DelayedMsgTask, ReminderTask,Timer, TimerTask
 class TimerApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Two Phase Timer")
+        self.title("Our Timer App")
         self.geometry("700x600")
         self.minsize(600, 540)
         self.configure(bg="#eef2f6")
@@ -67,8 +67,8 @@ class TimerApp(tk.Tk):
     def _build_header(self, parent):
         header = ttk.Frame(parent, style="App.TFrame", padding=(28, 24, 28, 12))
         header.pack(fill="x")
-        ttk.Label(header, text="Two Phase Timer", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(header, text="Build any process with two automatic steps.", style="Subtitle.TLabel").pack(anchor="w", pady=(3, 11))
+        ttk.Label(header, text="Our Timer App", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(header, text="A simple timer application.", style="Subtitle.TLabel").pack(anchor="w", pady=(3, 11))
         self.clock_label = ttk.Label(header, style="Clock.TLabel")
         self.clock_label.pack(anchor="w")
 
@@ -77,8 +77,8 @@ class TimerApp(tk.Tk):
         grid.pack(fill="x")
         grid.columnconfigure(0, weight=1)
         grid.columnconfigure(1, weight=1)
-        self.phase_data["phase1"] = self._build_phase_card(grid, 0, "PHASE 1", "Preparation", "40", "Card.Horizontal.TProgressbar")
-        self.phase_data["phase2"] = self._build_phase_card(grid, 1, "PHASE 2", "Action", "5", "Card.Horizontal.TProgressbar")
+        self.phase_data["phase1"] = self._build_phase_card(grid, 0, "Ceas 1", "Preparation", "40", "Card.Horizontal.TProgressbar")
+        self.phase_data["phase2"] = self._build_phase_card(grid, 1, "Ceas 2", "Action", "5", "Card.Horizontal.TProgressbar")
 
     def _build_phase_card(self, parent, column, heading, default_name, default_minutes, progress_style):
         card = ttk.Frame(parent, style="Card.TFrame", padding=16)
@@ -326,7 +326,6 @@ class TimerApp(tk.Tk):
         self.stop_timer_lab_reminder()
 
     def log(self, text):
-        """Thread-safe: timerele ruleaza pe fire separate, deci actualizam GUI prin after()."""
         self.after(0, self._log_impl, text)
 
     def _log_impl(self, text):
