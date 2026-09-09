@@ -10,5 +10,7 @@
     <tabs>
         <fx:include source="pomodoro-tab.fxml"/>
         <fx:include source="fitness-tab.fxml"/>
+        <fx:include source="timer-tab.fxml"/>
+        <fx:include source="reminder-tab.fxml"/>
     </tabs>
 </TabPane>
