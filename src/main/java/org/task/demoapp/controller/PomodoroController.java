@@ -105,7 +105,7 @@ public class PomodoroController {
         String message;
 
         if (workSession) {
-            buttonText = "START ODIHNA";
+            buttonText = "Incepe odihna!!";
             message = "Work time finished";
         } else {
             buttonText = "START LUCRU";
