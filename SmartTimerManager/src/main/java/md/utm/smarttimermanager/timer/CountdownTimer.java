@@ -1,123 +1,166 @@
 package md.utm.smarttimermanager.timer;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import javafx.application.Platform;
 
-public class CountdownTimer extends BaseTimer {
+public class CountdownTimer {
 
-    private int remainingSeconds;
-    private int initialSeconds;
+    private volatile int secundeRamase;
+    private int secundeInitiale;
 
-    private boolean paused = false;
+    private volatile boolean pauzat = false;
+    private volatile boolean running = false;
 
-    private Runnable updateAction;
+    private Thread firTimer;
+
+    private Runnable actiuneActualizare;
 
 
-    public CountdownTimer(Runnable updateAction) {
-        this.updateAction = updateAction;
+    public CountdownTimer(Runnable actiuneActualizare) {
+        this.actiuneActualizare = actiuneActualizare;
     }
 
 
-    public void setTime(int hours, int minutes, int seconds) {
+    public void setTime(int ore, int minute, int secunde) {
 
-        initialSeconds =
-                hours * 3600 +
-                        minutes * 60 +
-                        seconds;
+        secundeInitiale =
+                ore * 3600 +
+                        minute * 60 +
+                        secunde;
 
-        remainingSeconds = initialSeconds;
+        secundeRamase = secundeInitiale;
     }
 
 
-    @Override
     public void start() {
 
         if (running) {
             return;
         }
 
-        if (remainingSeconds <= 0) {
+        if (secundeRamase <= 0) {
             return;
         }
 
-        timer = new Timer(true);
-
         running = true;
-        paused = false;
+        pauzat = false;
 
 
-        TimerTask task = new TimerTask() {
+        firTimer = new Thread(() -> {
 
-            @Override
-            public void run() {
+            while (running && secundeRamase > 0) {
 
-                remainingSeconds--;
+                try {
 
-                updateAction.run();
+                    Thread.sleep(1000);
 
-                if (remainingSeconds <= 0) {
+                } catch (InterruptedException e) {
 
-                    remainingSeconds = 0;
-
-                    stopTimer();
+                    return;
                 }
+
+
+                if (!running) {
+                    return;
+                }
+
+
+                secundeRamase--;
+
+
+                if (secundeRamase <= 0) {
+
+                    secundeRamase = 0;
+
+                    running = false;
+                    pauzat = false;
+
+                    Platform.runLater(
+                            actiuneActualizare
+                    );
+
+                    return;
+                }
+
+
+                Platform.runLater(
+                        actiuneActualizare
+                );
             }
-        };
+        });
 
 
-        timer.scheduleAtFixedRate(
-                task,
-                1000,
-                1000
-        );
+        firTimer.setDaemon(true);
+
+        firTimer.start();
     }
 
 
     public void pause() {
 
-        stopTimer();
+        if (!running) {
+            return;
+        }
 
-        paused = true;
+        running = false;
+        pauzat = true;
+
+
+        if (firTimer != null) {
+            firTimer.interrupt();
+        }
     }
 
 
     public void cancel() {
 
-        stopTimer();
+        running = false;
+        pauzat = false;
 
-        paused = false;
 
-        remainingSeconds = initialSeconds;
+        if (firTimer != null) {
+            firTimer.interrupt();
+        }
 
-        updateAction.run();
+
+        secundeRamase = secundeInitiale;
+
+
+        Platform.runLater(
+                actiuneActualizare
+        );
     }
 
 
     public boolean isPaused() {
-        return paused;
+        return pauzat;
+    }
+
+
+    public boolean isRunning() {
+        return running;
     }
 
 
     public int getRemainingSeconds() {
-        return remainingSeconds;
+        return secundeRamase;
     }
 
 
-    public static String formatTime(int seconds) {
+    public static String formatTime(int secunde) {
 
-        int hours = seconds / 3600;
+        int ore = secunde / 3600;
 
-        int minutes =
-                (seconds % 3600) / 60;
+        int minute =
+                (secunde % 3600) / 60;
 
         int sec =
-                seconds % 60;
+                secunde % 60;
 
 
         return String.format(
                 "%02d:%02d:%02d",
-                hours,
-                minutes,
+                ore,
+                minute,
                 sec
         );
     }
