@@ -28,3 +28,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### IntelliJ project files ###
+.idea/
+*.iml
+
+### Java compiled ###
+*.class
