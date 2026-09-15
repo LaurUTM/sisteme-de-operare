@@ -3,7 +3,7 @@ package md.utm.smarttimermanager.timer;
 import java.util.Timer;
 
 public abstract class BaseTimer {
-
+//Cod nou
     protected Timer timer;
     protected boolean running = false;
 
