@@ -13,14 +13,10 @@ public class ScheduledAlarmTimer extends BaseTimer {
 
     private Runnable action;
 
-
-    // Constructor
     public ScheduledAlarmTimer(Runnable action) {
         this.action = action;
     }
 
-
-    // Setăm ora completă
     public void setTime(int hour, int minute, int second) {
 
         this.hour = hour;
@@ -28,23 +24,14 @@ public class ScheduledAlarmTimer extends BaseTimer {
         this.second = second;
     }
 
-
-    // SUPRAÎNCĂRCARE
-    // Dacă utilizatorul introduce doar ora și minutul,
-    // secundele vor fi automat 0.
     public void setTime(int hour, int minute) {
 
         setTime(hour, minute, 0);
     }
 
-
-    // SUPRASCRIERE
-    // start() există în BaseTimer,
-    // dar aici îi spunem ce face Timerul 2.
     @Override
     public void start() {
 
-        // Dacă exista deja o alarmă, o oprim.
         stopTimer();
 
         Calendar currentTime = Calendar.getInstance();
@@ -56,29 +43,22 @@ public class ScheduledAlarmTimer extends BaseTimer {
         alarmTime.set(Calendar.SECOND, second);
         alarmTime.set(Calendar.MILLISECOND, 0);
 
-
-        // Dacă ora a trecut deja azi,
-        // alarma va fi pentru ziua următoare.
         if (alarmTime.before(currentTime)) {
 
             alarmTime.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-
         Date date = alarmTime.getTime();
-
 
         timer = new Timer(true);
 
         running = true;
-
 
         TimerTask task = new TimerTask() {
 
             @Override
             public void run() {
 
-                // Executăm acțiunea
                 action.run();
 
                 running = false;
@@ -87,13 +67,9 @@ public class ScheduledAlarmTimer extends BaseTimer {
             }
         };
 
-
-        // Executăm task-ul la ora exactă.
         timer.schedule(task, date);
     }
 
-
-    // Butonul Cancel
     public void cancelAlarm() {
 
         stopTimer();
