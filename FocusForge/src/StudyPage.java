@@ -37,7 +37,7 @@ public class StudyPage extends JFrame {
 
     public StudyPage() {
         setTitle("Study Timer");
-        setSize(640, 620);
+        setSize(700, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(BACKGROUND_COLOR);
@@ -71,9 +71,21 @@ public class StudyPage extends JFrame {
 
         mainPanel.add(createReadingPanel());
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(createReminderPanel());
 
-        add(mainPanel);
+        mainPanel.add(createReminderPanel());
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        mainPanel.add(new ExerciseTimer());
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        mainPanel.add(new CountdownTimer());
+
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBackground(BACKGROUND_COLOR);
+
+        add(scrollPane);
     }
 
     private JPanel createReadingPanel() {
