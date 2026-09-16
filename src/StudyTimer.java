@@ -123,7 +123,7 @@ public class StudyTimer extends JPanel {
         if (minutes < 0 || seconds < 0 || seconds > 59) {
           JOptionPane.showMessageDialog(
                   this,
-                  "Introdu un timp corect."
+                  "Introduceti timpuk corect."
           );
           return;
         }
