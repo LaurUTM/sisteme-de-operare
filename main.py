@@ -7,6 +7,13 @@ from clock import DelayTimer
 from timer_lab import DelayedMsgTask, ReminderTask,Timer, TimerTask
 
 class TimerApp(tk.Tk):
+    """Fereastra principala a aplicatiei.
+
+    Are doua tab-uri:
+      - "Two Phase Timer": doua faze care se alterneaza automat (ceas 1 -> ceas 2 -> ...)
+      - "Timer Lab": demonstratia celor doua tipuri de timere (repetitiv si intarziat)
+    """
+
     def __init__(self):
         super().__init__()
         self.title("Our Timer App")
@@ -15,20 +22,27 @@ class TimerApp(tk.Tk):
         self.configure(bg="#eef2f6")
 
         self._setup_style()
-        self.running = False
-        self.active_phase = None
-        self.active_timer = None
-        self.deadline = None
-        self.phase_duration = 0
-        self.phase_data = {}
-        self.timer_lab_message_timer = Timer("TimerLabMessage")
-        self.timer_lab_reminder_timer = Timer("TimerLabReminder")
-        self.timer_lab_count = 0
+
+        # --- Starea secventei cu doua faze ---
+        self.running = False            # True cat timp secventa e pornita
+        self.active_phase = None        # "phase1" sau "phase2"
+        self.active_timer = None        # DelayTimer-ul fazei curente
+        self.deadline = None            # momentul la care se termina faza curenta
+        self.phase_duration = 0         # durata fazei curente, in secunde
+        self.phase_data = {}            # widget-urile fiecarei faze (entry-uri, label-uri, progressbar)
+
+        # --- Starea tab-ului Timer Lab ---
+        self.timer_lab_message_timer = Timer("TimerLabMessage")     # timer pentru mesajul intarziat
+        self.timer_lab_reminder_timer = Timer("TimerLabReminder")   # timer pentru reamintirea repetitiva
+        self.timer_lab_count = 0                                    # cate reamintiri s-au declansat
+        # Pentru fiecare din cele doua timere retinem: variabila progressbar-ului,
+        # job-ul de animatie (id-ul returnat de after), durata totala si momentul de start.
         self.timer_lab_progress_vars = {"message": None, "reminder": None}
         self.timer_lab_progress_jobs = {"message": None, "reminder": None}
         self.timer_lab_progress_totals = {"message": None, "reminder": None}
         self.timer_lab_progress_starts = {"message": None, "reminder": None}
 
+        # Notebook = containerul cu tab-uri.
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True)
 
@@ -38,16 +52,20 @@ class TimerApp(tk.Tk):
         self.timer_lab_tab = ttk.Frame(self.notebook, style="App.TFrame")
         self.notebook.add(self.timer_lab_tab, text="Timer Lab")
 
+        # Construim interfata, apoi pornim bucla de actualizare a ceasului.
         self._build_header(self.main_tab)
         self._build_timer_grid(self.main_tab)
         self._build_controls(self.main_tab)
         self._build_log(self.main_tab)
         self._build_timer_lab_tab(self.timer_lab_tab)
         self._refresh_display()
+        # Interceptam inchiderea ferestrei ca sa oprim timerele inainte de exit.
         self.protocol("WM_DELETE_WINDOW", self._close)
 
     def _setup_style(self):
+        """Defineste temele ttk (culori, fonturi, padding) folosite in toata aplicatia."""
         style = ttk.Style(self)
+        # "clam" e una din temele ttk care permit personalizarea culorilor.
         style.theme_use("clam")
         style.configure("App.TFrame", background="#eef2f6")
         style.configure("Card.TFrame", background="#ffffff")
@@ -59,65 +77,81 @@ class TimerApp(tk.Tk):
         style.configure("Time.TLabel", background="#ffffff", foreground="#18212f", font=("Courier", 27, "bold"))
         style.configure("Status.TLabel", background="#ffffff", foreground="#647184", font=("Helvetica", 9, "bold"))
         style.configure("Primary.TButton", background="#2563eb", foreground="#ffffff", borderwidth=0, padding=(13, 7), font=("Helvetica", 9, "bold"))
+        # map() = culoarea in starea "active" (cursorul deasupra butonului).
         style.map("Primary.TButton", background=[("active", "#1d4ed8")])
         style.configure("Stop.TButton", background="#e8edf3", foreground="#334155", borderwidth=0, padding=(13, 7), font=("Helvetica", 9, "bold"))
         style.map("Stop.TButton", background=[("active", "#d7dee8")])
         style.configure("Card.Horizontal.TProgressbar", troughcolor="#e8edf3", background="#2563eb", borderwidth=0, thickness=7)
 
     def _build_header(self, parent):
+        """Antetul: titlu, subtitlu si ceasul cu ora curenta."""
         header = ttk.Frame(parent, style="App.TFrame", padding=(28, 24, 28, 12))
         header.pack(fill="x")
         ttk.Label(header, text="Our Timer App", style="Title.TLabel").pack(anchor="w")
         ttk.Label(header, text="A simple timer application.", style="Subtitle.TLabel").pack(anchor="w", pady=(3, 11))
+        # Textul acestui label e rescris din _refresh_display(), de 4 ori pe secunda.
         self.clock_label = ttk.Label(header, style="Clock.TLabel")
         self.clock_label.pack(anchor="w")
 
     def _build_timer_grid(self, parent):
+        """Cele doua carduri (Ceas 1 si Ceas 2), asezate pe aceeasi linie."""
         grid = ttk.Frame(parent, style="App.TFrame", padding=(22, 5, 22, 14))
         grid.pack(fill="x")
+        # weight=1 pe ambele coloane => cardurile impart egal latimea ferestrei.
         grid.columnconfigure(0, weight=1)
         grid.columnconfigure(1, weight=1)
         self.phase_data["phase1"] = self._build_phase_card(grid, 0, "Ceas 1", "Preparation", "40", "Card.Horizontal.TProgressbar")
         self.phase_data["phase2"] = self._build_phase_card(grid, 1, "Ceas 2", "Action", "5", "Card.Horizontal.TProgressbar")
 
     def _build_phase_card(self, parent, column, heading, default_name, default_minutes, progress_style):
+        """Construieste un card de faza si returneaza widget-urile lui intr-un dict."""
         card = ttk.Frame(parent, style="Card.TFrame", padding=16)
         card.grid(row=0, column=column, sticky="nsew", padx=6)
         card.columnconfigure(0, weight=1)
         ttk.Label(card, text=heading, style="CardTitle.TLabel").grid(row=0, column=0, sticky="w")
+        # Numele fazei, editabil de utilizator.
         name_entry = ttk.Entry(card, font=("Helvetica", 10))
         name_entry.insert(0, default_name)
         name_entry.grid(row=1, column=0, sticky="ew", pady=(7, 11))
+        # Timpul ramas, actualizat in _refresh_display().
         time_label = ttk.Label(card, text=f"{int(default_minutes):02d}:00", style="Time.TLabel")
         time_label.grid(row=2, column=0, sticky="w", pady=(0, 7))
+        # Starea fazei: READY / RUNNING / NEXT / STOPPED.
         status_label = ttk.Label(card, text="READY", style="Status.TLabel")
         status_label.grid(row=3, column=0, sticky="w")
         progress = ttk.Progressbar(card, style=progress_style, mode="determinate", maximum=100)
         progress.grid(row=4, column=0, sticky="ew", pady=(9, 12))
         ttk.Label(card, text="Duration in minutes", style="CardText.TLabel").grid(row=5, column=0, sticky="w")
+        # Durata in minute, citita la apasarea pe Start.
         duration_entry = ttk.Entry(card, width=10, font=("Helvetica", 10))
         duration_entry.insert(0, default_minutes)
         duration_entry.grid(row=6, column=0, sticky="w", pady=(3, 0))
+        # Returnam referintele ca sa le putem citi/modifica ulterior din cod.
         return {"name": name_entry, "duration": duration_entry, "time": time_label, "status": status_label, "progress": progress}
 
     def _build_log(self, parent):
+        """Zona de log (jurnal de activitate) din tab-ul principal."""
         log_frame = ttk.Frame(parent, style="App.TFrame", padding=(28, 0, 28, 18))
         log_frame.pack(fill="x")
         ttk.Label(log_frame, text="Activity", style="CardText.TLabel").pack(anchor="w", pady=(0, 4))
+        # state="disabled" => read-only pentru utilizator; il deblocam temporar cand scriem.
         self.log_box = tk.Text(log_frame, height=4, state="disabled", bg="#ffffff", fg="#475569", relief="flat", font=("Courier", 9), padx=9, pady=7)
         self.log_box.pack(fill="x")
 
     def _build_controls(self, parent):
+        """Butoanele Start/Stop ale secventei si eticheta de stare."""
         controls = ttk.Frame(parent, style="App.TFrame", padding=(28, 2, 28, 14))
         controls.pack(fill="x")
         buttons = ttk.Frame(controls, style="App.TFrame")
         buttons.pack()
+        # command= primeste metoda, fara paranteze: e apelata la click, nu acum.
         ttk.Button(buttons, text="Start sequence", style="Primary.TButton", command=self.start_sequence).pack(side="left", padx=5)
         ttk.Button(buttons, text="Stop", style="Stop.TButton", command=self.stop_sequence).pack(side="left", padx=5)
         self.sequence_label = ttk.Label(controls, text="Ready to start Phase 1", style="Subtitle.TLabel")
         self.sequence_label.pack(pady=(9, 0))
 
     def _build_timer_lab_tab(self, parent):
+        """Tab-ul "Timer Lab": doua carduri, unul per tip de timer, plus log propriu."""
         container = ttk.Frame(parent, style="App.TFrame", padding=(24, 18, 24, 20))
         container.pack(fill="both", expand=True)
 
@@ -128,16 +162,19 @@ class TimerApp(tk.Tk):
             style="CardText.TLabel",
         ).pack(anchor="w", pady=(4, 12))
 
+        # --- Cardul 1: reamintire repetitiva (scheduleAtFixedRate) ---
         reminder_frame = ttk.Frame(container, style="Card.TFrame", padding=14)
         reminder_frame.pack(fill="x", pady=(0, 12))
 
         ttk.Label(reminder_frame, text="Timer 1 - Reminder", style="CardTitle.TLabel").grid(row=0, column=0, columnspan=3, sticky="w")
 
+        # Delay = cat se asteapta pana la prima executie.
         ttk.Label(reminder_frame, text="Delay (sec)", style="CardText.TLabel").grid(row=1, column=0, sticky="w", padx=(0, 12), pady=(10, 6))
         self.timer_lab_reminder_delay = ttk.Entry(reminder_frame, width=12)
         self.timer_lab_reminder_delay.insert(0, "3")
         self.timer_lab_reminder_delay.grid(row=1, column=1, sticky="w", pady=(10, 6))
 
+        # Perioada = intervalul dintre doua reamintiri consecutive.
         ttk.Label(reminder_frame, text="Perioada (sec)", style="CardText.TLabel").grid(row=2, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
         self.timer_lab_reminder_period = ttk.Entry(reminder_frame, width=12)
         self.timer_lab_reminder_period.insert(0, "1")
@@ -151,6 +188,7 @@ class TimerApp(tk.Tk):
         self.timer_lab_reminder_status = ttk.Label(reminder_frame, text="Ready", style="Status.TLabel")
         self.timer_lab_reminder_status.grid(row=4, column=0, columnspan=2, sticky="w", pady=(6, 6))
 
+        # DoubleVar leaga progressbar-ul de o valoare pe care o putem seta din cod.
         self.timer_lab_progress_vars["reminder"] = tk.DoubleVar(value=0)
         self.timer_lab_reminder_progress = ttk.Progressbar(
             reminder_frame,
@@ -167,6 +205,7 @@ class TimerApp(tk.Tk):
         ttk.Button(reminder_buttons, text="Start reminder", style="Primary.TButton", command=self.start_timer_lab_beep).pack(side="left", padx=(0, 8))
         ttk.Button(reminder_buttons, text="Stop reminder", style="Stop.TButton", command=self.stop_timer_lab_reminder).pack(side="left")
 
+        # --- Cardul 2: mesaj intarziat (schedule, o singura executie) ---
         message_frame = ttk.Frame(container, style="Card.TFrame", padding=14)
         message_frame.pack(fill="x")
 
@@ -201,19 +240,23 @@ class TimerApp(tk.Tk):
         ttk.Button(message_buttons, text="Start message", style="Primary.TButton", command=self.start_timer_lab_message).pack(side="left", padx=(0, 8))
         ttk.Button(message_buttons, text="Stop message", style="Stop.TButton", command=self.stop_timer_lab_message).pack(side="left")
 
+        # Log-ul propriu al tab-ului Timer Lab.
         self.timer_lab_log = tk.Text(container, height=8, state="disabled", bg="#ffffff", fg="#475569", relief="flat", font=("Courier", 9), padx=9, pady=7)
         self.timer_lab_log.pack(fill="both", expand=True, pady=(12, 0))
 
     def _timer_lab_log(self, text):
+        """Adauga o linie cu ora curenta in log-ul din Timer Lab."""
+        # Deblocam textul, scriem, derulam la final, blocam la loc.
         self.timer_lab_log.config(state="normal")
         self.timer_lab_log.insert("end", f"[{datetime.now().strftime('%H:%M:%S')}] {text}\n")
         self.timer_lab_log.see("end")
         self.timer_lab_log.config(state="disabled")
 
     def _read_timer_lab_delay(self, entry_widget, field_name):
+        """Citeste un delay din entry. Returneaza float-ul sau None daca e invalid."""
         try:
             value = float(entry_widget.get())
-            if value < 0:
+            if value < 0:                   # delay-ul poate fi 0, dar nu negativ
                 raise ValueError
             return value
         except ValueError:
@@ -221,6 +264,8 @@ class TimerApp(tk.Tk):
             return None
 
     def _read_timer_lab_period(self, entry_widget, field_name):
+        """La fel ca mai sus, dar perioada trebuie sa fie strict pozitiva
+        (o perioada de 0 ar declansa o bucla infinita)."""
         try:
             value = float(entry_widget.get())
             if value <= 0:
@@ -231,8 +276,10 @@ class TimerApp(tk.Tk):
             return None
 
     def _clear_timer_lab_progress(self, timer_name):
+        """Opreste animatia progressbar-ului si il aduce la 0."""
         job = self.timer_lab_progress_jobs.get(timer_name)
         if job is not None:
+            # Anulam apelul programat cu after(), altfel animatia continua.
             self.after_cancel(job)
         self.timer_lab_progress_jobs[timer_name] = None
         self.timer_lab_progress_totals[timer_name] = None
@@ -241,42 +288,51 @@ class TimerApp(tk.Tk):
             self.timer_lab_progress_vars[timer_name].set(0)
 
     def _start_timer_lab_progress(self, timer_name, total_seconds):
-        self._clear_timer_lab_progress(timer_name)
+        """Porneste animatia progressbar-ului pentru 'total_seconds' secunde."""
+        self._clear_timer_lab_progress(timer_name)      # oprim o eventuala animatie anterioara
+        # max(..., 0.1) evita impartirea la zero cand delay-ul e 0.
         self.timer_lab_progress_totals[timer_name] = max(float(total_seconds), 0.1)
         self.timer_lab_progress_starts[timer_name] = time.monotonic()
         self._update_timer_lab_progress(timer_name)
 
     def _update_timer_lab_progress(self, timer_name):
+        """Un cadru de animatie: calculeaza procentul scurs si se reprogrameaza."""
         start = self.timer_lab_progress_starts.get(timer_name)
         total = self.timer_lab_progress_totals.get(timer_name)
+        # Daca intre timp s-a apelat _clear_..., nu mai avem ce anima.
         if start is None or total is None:
             return
 
         elapsed = time.monotonic() - start
-        progress = min(100.0, max(0.0, (elapsed / total) * 100))
+        progress = min(100.0, max(0.0, (elapsed / total) * 100))    # limitam in [0, 100]
         self.timer_lab_progress_vars[timer_name].set(progress)
 
         if elapsed < total:
+            # after() ruleaza pe thread-ul de UI => actualizare sigura a widget-urilor.
             self.timer_lab_progress_jobs[timer_name] = self.after(100, self._update_timer_lab_progress, timer_name)
         else:
             self.timer_lab_progress_vars[timer_name].set(100)
             self._clear_timer_lab_progress(timer_name)
 
     def start_timer_lab_message(self):
+        """Buton "Start message": programeaza un mesaj o singura data, dupa delay."""
         delay = self._read_timer_lab_delay(self.timer_lab_message_delay, "Delay")
         if delay is None:
             return
 
         message = self.timer_lab_message_text.get().strip() or "Timer Lab message"
+        # Anulam o programare anterioara si folosim un Timer nou.
         self.timer_lab_message_timer.cancel()
         self.timer_lab_message_timer = Timer("TimerLabMessage")
         task = DelayedMsgTask(message, self._on_timer_lab_message)
+        # schedule() fara period => o singura executie.
         self.timer_lab_message_timer.schedule(task, delay)
         self.timer_lab_message_status.config(text=f"Scheduled message in {delay:.1f}s")
         self._start_timer_lab_progress("message", delay)
         self._timer_lab_log(f"Message timer started ({delay:.1f}s): {message}")
 
     def start_timer_lab_beep(self):
+        """Buton "Start reminder": porneste reamintirea repetitiva."""
         delay = self._read_timer_lab_delay(self.timer_lab_reminder_delay, "Delay")
         period = self._read_timer_lab_period(self.timer_lab_reminder_period, "Period")
         if delay is None or period is None:
@@ -287,48 +343,60 @@ class TimerApp(tk.Tk):
         self.timer_lab_count = 0
         message = self.timer_lab_reminder_message.get().strip() or "Bea apa!"
         task = ReminderTask(message, self._on_timer_lab_beep)
+        # scheduleAtFixedRate() => executii repetate la fiecare 'period' secunde.
         self.timer_lab_reminder_timer.scheduleAtFixedRate(task, delay, period)
         self.timer_lab_reminder_status.config(text=f"Repeating reminder every {period:.1f}s")
         self._start_timer_lab_progress("reminder", period)
         self._timer_lab_log(f"Reminder timer started (delay={delay:.1f}s, period={period:.1f}s, message='{message}')")
 
     def _on_timer_lab_message(self, message):
+        # Apelat de pe thread-ul timer-ului. Tkinter nu e thread-safe, deci
+        # trimitem actualizarea de UI pe thread-ul principal prin after(0, ...).
         self.after(0, self._timer_lab_message_ui, message)
 
     def _timer_lab_message_ui(self, message):
+        """Ruleaza pe thread-ul de UI: afiseaza mesajul care tocmai s-a declansat."""
         self.timer_lab_message_status.config(text=f"Message executed: {message}")
         self._clear_timer_lab_progress("message")
         self._timer_lab_log(f"Message fired: {message}")
 
     def _on_timer_lab_beep(self, count, message):
+        # Idem: de pe thread-ul timer-ului catre thread-ul de UI.
         self.after(0, self._timer_lab_beep_ui, count, message)
 
     def _timer_lab_beep_ui(self, count, message):
+        """Ruleaza pe thread-ul de UI la fiecare reamintire."""
         self.timer_lab_count = count
         self.timer_lab_reminder_status.config(text=f"Reminder running • count={count} • {message}")
+        # Repornim progressbar-ul pentru urmatorul interval.
         self._start_timer_lab_progress("reminder", float(self.timer_lab_reminder_period.get()))
         self._timer_lab_log(f"Reminder #{count}: {message}")
 
     def stop_timer_lab_message(self):
+        """Buton "Stop message": anuleaza mesajul intarziat inainte sa se declanseze."""
         self.timer_lab_message_timer.cancel()
         self.timer_lab_message_status.config(text="Ready")
         self._clear_timer_lab_progress("message")
         self._timer_lab_log("Message timer stopped")
 
     def stop_timer_lab_reminder(self):
+        """Buton "Stop reminder": opreste reamintirea repetitiva."""
         self.timer_lab_reminder_timer.cancel()
         self.timer_lab_reminder_status.config(text="Ready")
         self._clear_timer_lab_progress("reminder")
         self._timer_lab_log("Reminder timer stopped")
 
     def stop_timer_lab(self):
+        """Opreste ambele timere din Timer Lab."""
         self.stop_timer_lab_message()
         self.stop_timer_lab_reminder()
 
     def log(self, text):
+        # Poate fi apelat din orice thread; after(0, ...) muta scrierea pe thread-ul de UI.
         self.after(0, self._log_impl, text)
 
     def _log_impl(self, text):
+        """Scrie efectiv in log-ul tab-ului principal (doar pe thread-ul de UI)."""
         ts = datetime.now().strftime("%H:%M:%S")
         self.log_box.config(state="normal")
         self.log_box.insert("end", f"[{ts}] {text}\n")
@@ -336,7 +404,9 @@ class TimerApp(tk.Tk):
         self.log_box.config(state="disabled")
 
     def _read_phase(self, phase):
+        """Citeste numele si durata unei faze. Returneaza (nume, minute) sau None."""
         data = self.phase_data[phase]
+        # Daca utilizatorul a sters numele, folosim numele fazei ca fallback.
         name = data["name"].get().strip() or phase.title()
         try:
             minutes = float(data["duration"].get())
@@ -348,10 +418,13 @@ class TimerApp(tk.Tk):
         return name, minutes
 
     def start_sequence(self):
+        """Buton "Start sequence": valideaza ambele faze si porneste de la faza 1."""
         first = self._read_phase("phase1")
         second = self._read_phase("phase2")
+        # Daca vreo valoare e invalida, nu pornim nimic (eroarea a fost deja afisata).
         if first is None or second is None:
             return
+        # Daca deja rula ceva, oprim fara sa scriem in log ("silent").
         if self.running:
             self.stop_sequence(silent=True)
         self.phases = {"phase1": first, "phase2": second}
@@ -360,10 +433,13 @@ class TimerApp(tk.Tk):
         self.log(f"Sequence started: {first[0]} -> {second[0]}")
 
     def _start_phase(self, phase):
+        """Porneste o faza: calculeaza deadline-ul si programeaza trecerea la faza urmatoare."""
         name, minutes = self.phases[phase]
         self.active_phase = phase
         self.phase_duration = minutes * 60
+        # Deadline-ul e folosit in _refresh_display() pentru a calcula timpul ramas.
         self.deadline = datetime.now() + timedelta(seconds=self.phase_duration)
+        # lambda capteaza 'phase' ca sa stim, la expirare, care faza s-a terminat.
         self.active_timer = DelayTimer(self.phase_duration, lambda: self._phase_finished(phase))
         self.active_timer.start()
         other = "phase2" if phase == "phase1" else "phase1"
@@ -372,28 +448,36 @@ class TimerApp(tk.Tk):
         self.sequence_label.config(text=f"Now running: {name}")
 
     def _phase_finished(self, phase):
+        # Apelat de pe thread-ul DelayTimer-ului => mutam pe thread-ul de UI.
         self.after(0, lambda: self._switch_phase(phase))
 
     def _switch_phase(self, phase):
+        """Trece la faza urmatoare (faza 1 <-> faza 2), la nesfarsit."""
+        # Protectie impotriva unui timer vechi care expira dupa Stop sau dupa
+        # ce s-a pornit deja alta faza.
         if not self.running or phase != self.active_phase:
             return
         next_phase = "phase2" if phase == "phase1" else "phase1"
         finished_name = self.phases[phase][0]
         next_name = self.phases[next_phase][0]
-        self.bell()
+        self.bell()                         # semnal sonor de sistem
+        # Pornim faza urmatoare inainte de dialog: messagebox blocheaza executia
+        # pana cand utilizatorul apasa OK, deci cronometrul nu trebuie sa astepte.
         self._start_phase(next_phase)
         messagebox.showinfo(f"{finished_name} complete", f"Now starting: {next_name}", parent=self)
         self.log(f"Transition: {finished_name} -> {next_name}")
 
     def _set_phase_state(self, phase, state):
+        """Actualizeaza eticheta de stare a unei faze (verde doar cand ruleaza)."""
         data = self.phase_data[phase]
         color = "#16a34a" if state == "RUNNING" else "#647184"
         data["status"].config(text=state, foreground=color)
 
     def stop_sequence(self, silent=False):
+        """Opreste secventa si reseteaza afisajul. silent=True => fara linie in log."""
         if self.active_timer:
             self.active_timer.stop()
-        was_running = self.running
+        was_running = self.running          # retinem starea inainte de resetare
         self.running = False
         self.active_phase = None
         self.deadline = None
@@ -407,18 +491,24 @@ class TimerApp(tk.Tk):
             self.log("Sequence stopped by user")
 
     def _refresh_display(self):
+        """Bucla de afisare: ruleaza de 4 ori pe secunda cat timp aplicatia e deschisa."""
         now = datetime.now()
         self.clock_label.config(text=now.strftime("%A, %d %B  •  %H:%M:%S"))
         if self.running and self.deadline:
+            # Timpul ramas = deadline - acum (minim 0, ca sa nu afisam valori negative).
             remaining = max(0, (self.deadline - now).total_seconds())
             current = self.phase_data[self.active_phase]
             current["time"].config(text=self._format_seconds(remaining))
+            # Progressbar-ul scade de la 100 la 0 pe masura ce timpul se scurge.
             current["progress"]["value"] = max(0, min(100, remaining / self.phase_duration * 100))
+        # Ne reprogramam peste 250 ms => bucla continua.
         self.after(250, self._refresh_display)
 
     @staticmethod
     def _format_seconds(seconds):
+        """Formateaza secundele ca mm:ss, hh:mm:ss sau "Nd hh:mm" pentru durate mari."""
         total_seconds = int(seconds)
+        # divmod imparte succesiv in zile, ore, minute, secunde.
         days, remainder = divmod(total_seconds, 86400)
         hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -429,10 +519,12 @@ class TimerApp(tk.Tk):
         return f"{minutes:02d}:{seconds:02d}"
 
     def _close(self):
+        """Apelat la inchiderea ferestrei: oprim timerele, apoi distrugem fereastra."""
         self.stop_sequence(silent=True)
         self.destroy()
 
 
 if __name__ == "__main__":
+    # Punctul de intrare: cream fereastra si intram in bucla de evenimente Tkinter.
     app = TimerApp()
     app.mainloop()
