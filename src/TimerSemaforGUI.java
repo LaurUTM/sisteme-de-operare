@@ -60,7 +60,7 @@ public class TimerSemaforGUI extends JPanel {
                     butonStartStop.setText("Start");
                 } else {
                     timer.start();
-                    butonStartStop.setText("Stop");
+                    butonStartStop.setText("Sfarsit");
                 }
             }
         });
