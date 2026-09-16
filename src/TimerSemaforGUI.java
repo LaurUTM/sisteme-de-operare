@@ -1,36 +1,3 @@
-/*
- * ============================================================================
- *  IMPLEMENTARE — "Semafor (versiune GUI Swing)"
- * ============================================================================
- *
- *  IDEEA DE IMPLEMENTARE (se citește înainte de cod):
- *
- *  Scop: aceeași logică de semafor (modul PERIOADĂ INDICATĂ), dar cu interfață
- *        grafică Swing, în stilul Exemplului 2 din laborator (javax.swing.Timer).
- *
- *  De ce javax.swing.Timer si NU java.util.Timer:
- *        actualizarea componentelor Swing trebuie facuta pe Event Dispatch
- *        Thread (EDT). javax.swing.Timer declanseaza actionPerformed() chiar pe
- *        EDT, deci putem apela in siguranta repaint()/setText(). Cu
- *        java.util.Timer ar fi trebuit sa impachetam totul in
- *        SwingUtilities.invokeLater(...).
- *
- *  Pași de proiectare:
- *    1. Reutilizam ideea de enum Stare { VERDE, GALBEN, ROSU } cu durata (s) si
- *       tranzitia catre culoarea urmatoare.
- *    2. PanouSemafor extends JPanel: in paintComponent deseneaza 3 becuri
- *       (cercuri). Becul starii curente e "aprins" (culoare vie), restul sunt
- *       "stinse" (culoare inchisa).
- *    3. Un javax.swing.Timer cu perioada 1000 ms: la fiecare tick scade
- *       secundele ramase; cand ajung la 0 trece la culoarea urmatoare, apoi
- *       actualizeaza eticheta si cheama repaint().
- *    4. Fereastra JFrame contine panoul si o eticheta de stare jos.
- *    5. Buton Start/Stop optional pentru a porni/opri timerul.
- *
- *  Clase Java folosite: javax.swing.*, java.awt.*, javax.swing.Timer.
- * ============================================================================
- */
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -38,13 +5,12 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
-public class TimerSemaforGUI extends JFrame {
+public class TimerSemaforGUI extends JPanel {
 
     enum Stare {
         VERDE(5), GALBEN(2), ROSU(5);
@@ -73,11 +39,11 @@ public class TimerSemaforGUI extends JFrame {
     private final Timer timer;
 
     public TimerSemaforGUI() {
-        super("Semafor");
+        setLayout(new BorderLayout());
 
-        getContentPane().add(panou, BorderLayout.CENTER);
-        getContentPane().add(eticheta, BorderLayout.NORTH);
-        getContentPane().add(butonStartStop, BorderLayout.SOUTH);
+        add(panou, BorderLayout.CENTER);
+        add(eticheta, BorderLayout.NORTH);
+        add(butonStartStop, BorderLayout.SOUTH);
 
         timer = new Timer(1_000, new ActionListener() {
             @Override
@@ -100,9 +66,8 @@ public class TimerSemaforGUI extends JFrame {
         });
 
         actualizeazaEticheta();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(220, 420);
-        setLocationRelativeTo(null); // centreaza fereastra
+
+        timer.start(); // pornim semaforul
     }
 
     private void tick() {
@@ -149,16 +114,5 @@ public class TimerSemaforGUI extends JFrame {
             g.setColor(Color.BLACK);
             g.drawOval(x, y, d, d);
         }
-    }
-
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                TimerSemaforGUI fereastra = new TimerSemaforGUI();
-                fereastra.setVisible(true);
-                fereastra.timer.start(); // pornim semaforul
-            }
-        });
     }
 }

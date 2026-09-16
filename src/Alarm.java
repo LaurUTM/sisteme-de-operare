@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.time.LocalTime;
 
-public class Alarm extends JFrame {
+public class Alarm extends JPanel {
 
     JLabel timeLabel;
     JLabel statusLabel;
@@ -20,11 +20,7 @@ public class Alarm extends JFrame {
 
     public Alarm() {
 
-        setTitle("Timer 2 Golovaciuc");
-        setSize(450, 350);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
+        setLayout(new BorderLayout());
 
         // Titlu
         JLabel titleLabel = new JLabel("ALARMA", SwingConstants.CENTER);
@@ -87,7 +83,7 @@ public class Alarm extends JFrame {
         panel.add(Box.createVerticalStrut(20));
         panel.add(buttonPanel);
 
-        add(panel);
+        add(panel, BorderLayout.CENTER);
 
 
         // Pornirea alarmei
@@ -192,13 +188,5 @@ public class Alarm extends JFrame {
 
             statusLabel.setText("Alarma oprita.");
         }
-    }
-
-
-    public static void main(String[] args) {
-
-        Alarm alarm = new Alarm();
-
-        alarm.setVisible(true);
     }
 }

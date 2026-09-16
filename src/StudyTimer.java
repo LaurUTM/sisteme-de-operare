@@ -3,7 +3,7 @@ import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class StudyTimer extends JFrame {
+public class StudyTimer extends JPanel {
 
   // Elementele interfetei
   JLabel timeLabel;
@@ -25,11 +25,7 @@ public class StudyTimer extends JFrame {
 
   public StudyTimer() {
 
-    setTitle("Timer 1 Golovaciuc");
-    setSize(450, 400);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
-    setResizable(false);
+    setLayout(new BorderLayout());
 
     // Titlu
     JLabel titleLabel = new JLabel("STUDY TIMER", SwingConstants.CENTER);
@@ -94,7 +90,7 @@ public class StudyTimer extends JFrame {
     panel.add(Box.createVerticalStrut(20));
     panel.add(buttonPanel);
 
-    add(panel);
+    add(panel, BorderLayout.CENTER);
 
 
     // Butonul START
@@ -256,15 +252,6 @@ public class StudyTimer extends JFrame {
     timeLabel.setText(
             String.format("%02d:%02d", minutes, seconds)
     );
-  }
-
-
-  // Pornirea programului
-  public static void main(String[] args) {
-
-    StudyTimer timer = new StudyTimer();
-
-    timer.setVisible(true);
   }
 }
 
