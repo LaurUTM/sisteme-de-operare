@@ -138,7 +138,7 @@ public class HelloController {
                 () -> Platform.runLater(() -> {
 
                     focusStatusLabel.setText(
-                            "● Sfarsit"
+                            "● Sfarsit seseiuneeee"
                     );
 
                     focusProgressBar.setProgress(1);
