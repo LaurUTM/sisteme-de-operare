@@ -20,7 +20,7 @@ public class CountdownTimer {
     }
 
 
-    public void setTime(int ore, int minute, int secunde) {
+    public void setTime(int ore, int minute, int secunde) {//se face initiakuzarea
 
         secundeInitiale =
                 ore * 3600 +
@@ -45,9 +45,9 @@ public class CountdownTimer {
         pauzat = false;
 
 
-        firTimer = new Thread(() -> {
+        firTimer = new Thread(() -> {//creeam un fioer seoparat de executie
 
-            while (running && secundeRamase > 0) {
+            while (running && secundeRamase > 0) {//repet codul atat timp cat timerul ruleaza si mai exista
 
                 try {
 
@@ -64,7 +64,7 @@ public class CountdownTimer {
                 }
 
 
-                secundeRamase--;
+                secundeRamase--;//scade cu 1
 
 
                 if (secundeRamase <= 0) {
@@ -89,7 +89,7 @@ public class CountdownTimer {
         });
 
 
-        firTimer.setDaemon(true);
+        firTimer.setDaemon(true);//nu tine timerul deschis
 
         firTimer.start();
     }
