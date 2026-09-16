@@ -366,7 +366,7 @@ public class HelloController {
                     secunda < 0 || secunda > 59) {
 
                 exactStatusLabel.setText(
-                        "● Time nevalid"
+                        "● Timp nevalid"
                 );
 
                 return;
