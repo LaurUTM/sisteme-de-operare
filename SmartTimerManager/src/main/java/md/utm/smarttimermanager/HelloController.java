@@ -138,7 +138,7 @@ public class HelloController {
                 () -> Platform.runLater(() -> {
 
                     focusStatusLabel.setText(
-                            "● Finished"
+                            "● Sfarsit"
                     );
 
                     focusProgressBar.setProgress(1);
@@ -470,11 +470,11 @@ public class HelloController {
 
 
     @FXML
-    private void startFocus() {
+    private void startFocus() {//initializat
 
         if (timerFocus.isPaused()) {
 
-            timerFocus.start();
+            timerFocus.start();//incepe lucrul
 
             focusStatusLabel.setText(
                     "● Running"
