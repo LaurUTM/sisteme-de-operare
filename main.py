@@ -217,7 +217,7 @@ class TimerApp(tk.Tk):
         try:
             secunde = float(self.interval_entry.get())
         except ValueError:
-            self._log("Eroare: numar de secunde invalid pentru IntervalTask")
+            self._log("Eroare: numar de secunde invalid DUPA CERINTA PROFESOAREI pentru IntervalTask")
             return
         self.interval_status.config(text="Status: in asteptare...", fg="orange")
         self.interval_task = IntervalTask(secunde, self._on_interval,
