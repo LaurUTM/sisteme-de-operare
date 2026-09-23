@@ -187,7 +187,7 @@ class TimerApp(tk.Tk):
 
     def _on_interval(self, mesaj):
         self.after(0, lambda: (
-            self.interval_status.config(text="Status: declansat!", fg="green"),
+            self.interval_status.config(text="STATUS ACTUALIZAT DUPA CEREREA PROFESOAREI", fg="green"),
             self._log(f"IntervalTask: {mesaj}")
         ))
 
