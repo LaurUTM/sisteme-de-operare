@@ -5,7 +5,7 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
-
+#aici am adaugat ceva nou
 class TimerTask:
     def __init__(self):
         self._cancelled = threading.Event()
