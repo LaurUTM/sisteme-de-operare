@@ -31,9 +31,12 @@ public class Main {
 
         // Timer 2 - descrescator
         JLabel restLabel = new JLabel("", SwingConstants.CENTER);
-        RestTimer restTimer = new RestTimer(restLabel);
+        RestTimer restTimer = new RestTimer(restLabel, workoutTimer::start);
         JButton rest = new JButton("Pauza 60s");
-        rest.addActionListener(e -> restTimer.start(60));
+        rest.addActionListener(e -> {
+            workoutTimer.stop();
+            restTimer.start(60);
+        });
 
         JPanel restButtons = new JPanel();
         restButtons.add(rest);

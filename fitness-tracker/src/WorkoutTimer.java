@@ -3,7 +3,7 @@ import javax.swing.*;
 /** Timer crescator: masoara durata antrenamentului si estimeaza caloriile arse. */
 public class WorkoutTimer {
 
-    private static final double KCAL_PER_SECOND = 0.15; // ~9 kcal/min la alergare
+    private static final double KCAL_PER_SECOND = 0.1; // ~6 kcal/min, antrenament moderat
 
     private final JLabel label;
     private final Timer timer;

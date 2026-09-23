@@ -5,11 +5,13 @@ import java.awt.*;
 public class RestTimer {
 
     private final JLabel label;
+    private final Runnable onFinished;
     private final Timer timer;
     private int seconds;
 
-    public RestTimer(JLabel label) {
+    public RestTimer(JLabel label, Runnable onFinished) {
         this.label = label;
+        this.onFinished = onFinished;
         this.timer = new Timer(1000, e -> tick());
         label.setText("Pauza: --");
     }
@@ -27,6 +29,7 @@ public class RestTimer {
             timer.stop();
             Toolkit.getDefaultToolkit().beep();
             label.setText("Pauza s-a terminat! Incepe setul urmator.");
+            onFinished.run();
         }
     }
 
