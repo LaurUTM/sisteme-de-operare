@@ -230,7 +230,7 @@ class TimerApp(tk.Tk):
             ora = int(self.ora_entry.get())
             minut = int(self.minut_entry.get())
         except ValueError:
-            self._log("Eroare: ora/minut invalide pentru ExactTimeTask")
+            self._log("SCHIMBARE DE COD Eroare: ora/minut invalid pentru ExactTimeTask")
             return
         self.exact_status.config(text="Status: in asteptare...", fg="orange")
         self.exact_task = ExactTimeTask(ora, minut, self._on_exact, 0, "Salut, Salut, Salut!!!")
@@ -264,7 +264,7 @@ class TimerApp(tk.Tk):
             minut = int(self.rep_minut_entry.get())
             perioada = float(self.rep_period_entry.get())
         except ValueError:
-            self._log("Eroare: valori invalide pentru RepeatingExactTask")
+            self._log("Eroare: valori invaliSDADSADde pentru RepeatingExactTask")
             return
         self.repeating_counter = 0
         self.repeating_counter_label.config(text="Executii: 0")
