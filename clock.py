@@ -11,8 +11,8 @@ class DelayTimer:
         self._timer = None                  # obiectul threading.Timer creat la start()
 
     def start(self):
-        # Cream un thread nou de fiecare data: un threading.Timer nu poate fi repornit.
-        self._timer = threading.Timer(self.delay_sec, self.callback)
+        # creează un obiect nou de tip threading.Timer, dar nu îl pornește încă.
+        self._timer = threading.Timer(self.delay_sec, self.callback) # Este un constructor, creeaza o instanta a clasei Timer, self_delay = interval cat timp asteapta pana la exec, fallback functioa v a fi apelata la expirarea timerului. 
         # daemon=True => thread-ul nu tine procesul in viata la inchiderea aplicatiei.
         self._timer.daemon = True
         self._timer.start()
