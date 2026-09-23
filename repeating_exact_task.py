@@ -57,5 +57,5 @@ class RepeatingExactTask:
 
 if __name__ == "__main__":
     print("Start RepeatingExactTask - porneste la ora 18:24, apoi se repeta la 5 secunde")
-    task = RepeatingExactTask(18, 24, 5, None, 0, "Reamintire periodica!")
+    task = RepeatingExactTask(10, 14, 5, None, 0, "Reamintire periodica!")
     task.start()
