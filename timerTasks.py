@@ -68,6 +68,7 @@ class Timer:
             next_run += period
 
 
+# aici Augustin face schimbarea
 class RepeatingTimer:
     def __init__(self, interval, action):
         self.interval = interval
