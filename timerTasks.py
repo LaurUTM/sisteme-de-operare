@@ -6,7 +6,7 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
-
+#aici am adaugat ceva nou
 class TimerTask:
     def __init__(self):
         self._cancelled = threading.Event()
@@ -22,6 +22,7 @@ class TimerTask:
         return self._cancelled.is_set()
 
 
+# Timerul notifica aplicatia ca a expirat un interval de timp prestabilit
 class Timer:
     def __init__(self, name="timer"):
         self.name = name
