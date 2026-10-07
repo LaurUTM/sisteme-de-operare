@@ -71,7 +71,7 @@ public class TimerApp extends JFrame {
         panel.add(butonStop);
 
         // cronometru
-        panel.add(new JLabel("Cronometru:"));
+        panel.add(new JLabel("Cronometrul:"));
 
         cronometruLabel = new JLabel("00:00:00");
         panel.add(cronometruLabel);
