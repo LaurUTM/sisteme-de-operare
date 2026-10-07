@@ -48,7 +48,7 @@ public class TimerApp extends JFrame {
         panel.add(new JLabel(""));
 
         // timer 2
-        panel.add(new JLabel("Ora (HH:mm):"));
+        panel.add(new JLabel("Alt Text (HH:mm):"));
 
         oraField = new JTextField("12:00");
         panel.add(oraField);
