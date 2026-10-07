@@ -59,7 +59,7 @@ public class TimerApp extends JFrame {
         panel.add(new JLabel(""));
 
         // timer 3
-        panel.add(new JLabel("Perioada (secunde):"));
+        panel.add(new JLabel("Iara text (secunde):"));
 
         perioadaField = new JTextField("3");
         panel.add(perioadaField);
