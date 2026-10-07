@@ -216,7 +216,7 @@ public class TimerApp extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Foloseste formatul HH:mm"
+                "Alt text HH:MM"
             );
         }
     }
