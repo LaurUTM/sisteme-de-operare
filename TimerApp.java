@@ -241,7 +241,7 @@ public class TimerApp extends JFrame {
             timerPeriodic = new Timer();
 
             statusLabel.setText(
-                "Timer periodic: fiecare "
+                "Timer periodic PENTRU : fiecare "
                 + secunde
                 + " secunde"
             );
