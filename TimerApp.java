@@ -294,7 +294,7 @@ public class TimerApp extends JFrame {
             timerPeriodic = null;
 
             statusLabel.setText(
-                "Timer periodic oprit"
+                "Timer periodic astanavit"
             );
         }
     }
