@@ -281,7 +281,7 @@ public class TimerApp extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Introdu o perioada !!! valida!"
+                "Introdu o perioada valida!"
             );
         }
     }
@@ -294,7 +294,7 @@ public class TimerApp extends JFrame {
             timerPeriodic = null;
 
             statusLabel.setText(
-                "Timer periodic !!! astanavit"
+                "Timer periodic oprit"
             );
         }
     }
