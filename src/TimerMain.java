@@ -15,10 +15,14 @@ public class TimerMain {
                 taburi.addTab("Study Timer", new StudyTimer());
                 taburi.addTab("Alarma", new Alarm());
                 taburi.addTab("Examen", new TimerExamen());
+                // Timerele adăugate de mine (mesajele lor se afișează în consolă)
+                taburi.addTab("Ceainic", new CeaiTimer(mesaj -> System.out.println(mesaj)));
+                taburi.addTab("Mementouri", new MementoTimer(mesaj -> System.out.println(mesaj)));
+                taburi.addTab("Zar automat", new ZarTimer(mesaj -> System.out.println(mesaj)));
 
                 fereastra.add(taburi);
                 fereastra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                fereastra.setSize(500, 500);
+                fereastra.setSize(700, 500);
                 fereastra.setLocationRelativeTo(null); // centreaza fereastra
                 fereastra.setVisible(true);
             }
