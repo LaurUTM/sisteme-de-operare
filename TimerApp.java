@@ -149,7 +149,7 @@ public class TimerApp extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Introdu un numar !!! valid!"
+                "Introdu un numar !!! !!valid!"
             );
         }
     }
