@@ -281,7 +281,7 @@ public class TimerApp extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Introdu o perioada valida!"
+                "Introdu o perioada !!! valida!"
             );
         }
     }
