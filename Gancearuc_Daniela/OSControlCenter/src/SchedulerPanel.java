@@ -100,13 +100,24 @@ public class SchedulerPanel extends JPanel {
     private final JTextArea description = Theme.note("");
     private final GanttChart gantt = new GanttChart();
     private final JTextArea summary = Theme.logArea();
+    private JTabbedPane resultTabs;
     private final DefaultTableModel table = new DefaultTableModel(
         new Object[]{"Proces", "Timp execuție", "Se termină la", "Timp așteptare"}, 0) {
         @Override public boolean isCellEditable(int r, int c) { return false; }
     };
 
-    public SchedulerPanel() {
+    // ---- rularea în timp real (legătura cu Lab 1, 2 și 5) ----
+    private final MonitorPanel monitor;
+    private final JSpinner unitMs = new JSpinner(new SpinnerNumberModel(500, 100, 3000, 100));
+    private final JButton liveButton = new JButton("▶ Rulează în timp real");
+    private final JButton stopButton = new JButton("■ Oprește");
+    private final JLabel liveStatus = new JLabel(" ");
+    private final JTextArea liveLog = Theme.logArea();
+    private LiveRunner live;
+
+    public SchedulerPanel(MonitorPanel monitor) {
         super(new BorderLayout(12, 12));
+        this.monitor = monitor;
         setBackground(Theme.BG);
         setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
 
@@ -147,6 +158,26 @@ public class SchedulerPanel extends JPanel {
         options.add(calc);
         options.add(compare);
 
+        liveButton.setFont(Theme.BOLD);
+        liveButton.setForeground(Theme.OK);
+        liveButton.addActionListener(e -> startLive());
+        stopButton.setEnabled(false);
+        stopButton.addActionListener(e -> { if (live != null) live.stop(); });
+        liveStatus.setFont(Theme.BOLD);
+        JPanel liveRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        liveRow.setOpaque(false);
+        liveRow.add(new JLabel("Timp real:  1 unitate ="));
+        liveRow.add(unitMs);
+        liveRow.add(new JLabel("ms"));
+        liveRow.add(liveButton);
+        liveRow.add(stopButton);
+        liveRow.add(liveStatus);
+
+        JPanel south = new JPanel(new GridLayout(2, 1, 0, 6));
+        south.setOpaque(false);
+        south.add(options);
+        south.add(liveRow);
+
         JPanel body = new JPanel(new BorderLayout(0, 8));
         body.add(row1, BorderLayout.NORTH);
         JScrollPane inScroll = new JScrollPane(input);
@@ -156,7 +187,7 @@ public class SchedulerPanel extends JPanel {
         middle.add(description, BorderLayout.NORTH);
         middle.add(inScroll, BorderLayout.CENTER);
         body.add(middle, BorderLayout.CENTER);
-        body.add(options, BorderLayout.SOUTH);
+        body.add(south, BorderLayout.SOUTH);
         return Theme.card("Date de intrare (Lab 4)", body);
     }
 
@@ -172,7 +203,11 @@ public class SchedulerPanel extends JPanel {
         JPanel bottom = new JPanel(new GridLayout(1, 2, 12, 0));
         bottom.setOpaque(false);
         bottom.add(tableScroll);
-        bottom.add(new JScrollPane(summary));
+        JTabbedPane right = new JTabbedPane();
+        right.addTab("Calcule", new JScrollPane(summary));
+        right.addTab("Jurnal timp real", new JScrollPane(liveLog));
+        resultTabs = right;
+        bottom.add(right);
 
         JPanel body = new JPanel(new BorderLayout(0, 10));
         body.add(gantt, BorderLayout.NORTH);
@@ -241,6 +276,92 @@ public class SchedulerPanel extends JPanel {
          .append(String.format(" = %.2f", r.avgSegmentEnd()));
         summary.setText(s.toString());
         summary.setCaretPosition(0);
+    }
+
+    // =====================================================================
+    // RULAREA ÎN TIMP REAL - aici se leagă toate lucrările:
+    //   Lab 4 calculează planul, Lab 1 (Timer) îl execută,
+    //   Lab 5 (ProcessBuilder + monitor) pornește procese reale și arată CPU,
+    //   Lab 2: totul rulează pe nucleele mașinii virtuale.
+    // =====================================================================
+
+    private void startLive() {
+        if (live != null && live.isActive()) return;
+        Scheduler.Result plan;
+        try {
+            plan = runSelected();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Date greșite: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        calculate();                 // afișăm planul (diagrama, tabelul)
+        gantt.setProgress(0);
+        liveLog.setText("");
+        resultTabs.setSelectedIndex(1);
+
+        int cores = Runtime.getRuntime().availableProcessors();
+        int ms = (Integer) unitMs.getValue();
+        int total = plan.segments.get(plan.segments.size() - 1).end;
+        String mode = LiveRunner.usesRealProcesses()
+            ? "procese reale (sh), oprite cu kill -STOP și pornite cu kill -CONT"
+            : "fire de execuție (Thread)";
+        logLive(String.format("%s: %d unități x %d ms = %.1f secunde", plan.algorithm, total, ms, total * ms / 1000.0));
+        logLive("Mod: " + mode);
+        logLive(String.format("VM are %d nuclee -> un proces ocupă ~1 nucleu, adică ~%.0f %% CPU", cores, 100.0 / cores));
+        monitor.liveStarted("pornesc „" + plan.algorithm + "” în timp real (" + total + " unități)");
+
+        liveButton.setEnabled(false);
+        stopButton.setEnabled(true);
+        algorithm.setEnabled(false);
+
+        live = new LiveRunner(plan, ms, new LiveRunner.Listener() {
+            @Override public void onTick(int time, Scheduler.Segment current) {
+                double cpu = monitor.lastCpu();
+                SwingUtilities.invokeLater(() -> {
+                    gantt.setProgress(time + 1);
+                    liveStatus.setText(String.format("t = %d / %d   rulează: %s   CPU: %.0f %%",
+                        time + 1, total, current != null ? current.name : "-", cpu));
+                });
+            }
+            @Override public void onSwitch(int time, String from, String to, String id) {
+                monitor.liveRunning(to, gantt.colorOf(to));
+                String text = from == null
+                    ? String.format("t=%-3d pornește %s (%s)", time, to, id)
+                    : String.format("t=%-3d comutare de context: %s -> %s (%s)", time, from, to, id);
+                logLive(text);
+                monitor.liveMessage(text);
+            }
+            @Override public void onFinish(int time, String process) {
+                String text = String.format("t=%-3d procesul %s s-a terminat", time, process);
+                logLive(text);
+                monitor.liveMessage(text);
+            }
+            @Override public void onEnd(boolean completed) {
+                String text = completed ? "Gata: toate procesele s-au terminat." : "Oprit manual.";
+                logLive(text);
+                monitor.liveStopped(text);
+                SwingUtilities.invokeLater(() -> {
+                    liveButton.setEnabled(true);
+                    stopButton.setEnabled(false);
+                    algorithm.setEnabled(true);
+                    liveStatus.setText(completed ? "Gata ✔" : "Oprit");
+                    if (!completed) gantt.setProgress(-1);
+                });
+            }
+        });
+        live.start();
+    }
+
+    private void logLive(String text) {
+        SwingUtilities.invokeLater(() -> {
+            liveLog.append(Util.now() + "  " + text + "\n");
+            liveLog.setCaretPosition(liveLog.getDocument().getLength());
+        });
+    }
+
+    /** Apelat la închiderea programului, ca să nu rămână procese pornite. */
+    public void shutdown() {
+        if (live != null) live.stop();
     }
 
     /** Rulează aceleași procese prin toți algoritmii și arată un tabel de comparație. */

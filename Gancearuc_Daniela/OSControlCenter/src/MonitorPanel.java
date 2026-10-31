@@ -47,6 +47,12 @@ public class MonitorPanel extends JPanel {
 
     private Timer monitorTimer;
 
+    // ---- legătura cu planificatorul din Lab 4 (rularea în timp real) ----
+    private volatile String liveName = null;
+    private volatile Color liveColor = null;
+    private volatile double lastCpu = 0;
+    private int savedInterval = -1;
+
     public MonitorPanel() {
         super(new BorderLayout(12, 12));
         setBackground(Theme.BG);
@@ -117,6 +123,9 @@ public class MonitorPanel extends JPanel {
         long usedMb = Math.max(0, totalMb - freeMb);
         double ramPercent = totalMb > 0 ? usedMb * 100.0 / totalMb : 0;
 
+        lastCpu = cpu;
+        final String runningNow = liveName;        // ce proces rulează acum în planificator (dacă rulează)
+        final Color runningColor = liveColor;
         final double cpuF = cpu;
         SwingUtilities.invokeLater(() -> {
             cpuBar.setValue((int) Math.round(cpuF));
@@ -126,12 +135,13 @@ public class MonitorPanel extends JPanel {
             ramBar.setValue((int) Math.round(ramPercent));
             ramBar.setString(String.format("%.1f %%", ramPercent));
             ramText.setText(Util.formatMb(usedMb) + " folosită / " + Util.formatMb(freeMb) + " liberă");
-            history.add(cpuF, ramPercent);
+            history.add(cpuF, ramPercent, runningNow, runningColor);
         });
 
         if (saveLog.isSelected()) {
-            String entry = String.format("%s - CPU: %.2f%% | Memorie: %d MB folosită / %d MB total",
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), cpu, usedMb, totalMb);
+            String entry = String.format("%s - CPU: %.2f%% | Memorie: %d MB folosită / %d MB total%s",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), cpu, usedMb, totalMb,
+                runningNow != null ? " | rulează procesul " + runningNow : "");
             try (FileWriter w = new FileWriter(LOG_FILE, true)) { // true = adaugă la sfârșit
                 w.write(entry + "\n");
             } catch (Exception e) {
@@ -156,6 +166,42 @@ public class MonitorPanel extends JPanel {
         } catch (Exception ignored) { }
         return fallback;
     }
+
+    // =====================================================================
+    // Legătura cu Lab 4: planificatorul ne anunță ce proces rulează
+    // =====================================================================
+
+    /** Pornește rularea în timp real: citim CPU la fiecare secundă, ca să se vadă comutările. */
+    public void liveStarted(String info) {
+        print("[Planificator] " + info);
+        SwingUtilities.invokeLater(() -> {
+            if (savedInterval < 0) savedInterval = (Integer) interval.getValue();
+            interval.setValue(1);
+        });
+    }
+
+    /** Procesul care rulează acum (apare ca bandă colorată sub grafic). */
+    public void liveRunning(String name, Color color) {
+        liveName = name;
+        liveColor = color;
+    }
+
+    public void liveMessage(String text) {
+        print("[Planificator] " + text);
+    }
+
+    public void liveStopped(String info) {
+        liveName = null;
+        liveColor = null;
+        SwingUtilities.invokeLater(() -> {
+            if (savedInterval > 0) interval.setValue(savedInterval);
+            savedInterval = -1;
+            print("[Planificator] " + info);
+        });
+    }
+
+    /** Ultima valoare citită a procesorului, în procente. */
+    public double lastCpu() { return lastCpu; }
 
     // =====================================================================
     // Procese și comenzi de sistem
@@ -408,18 +454,28 @@ public class MonitorPanel extends JPanel {
         return p;
     }
 
-    /** Grafic mic cu ultimele 60 de citiri (CPU albastru, RAM portocaliu). */
+    /**
+     * Grafic mic cu ultimele 60 de citiri (CPU albastru, RAM portocaliu).
+     * Dacă planificatorul rulează în timp real, sub grafic apare o bandă colorată
+     * cu procesul care rula în acel moment - aceleași culori ca în diagrama Gantt.
+     */
     private static class HistoryChart extends JPanel {
-        private final List<double[]> points = new ArrayList<>();
+        private static class Point {
+            final double cpu, ram; final String name; final Color color;
+            Point(double cpu, double ram, String name, Color color) {
+                this.cpu = cpu; this.ram = ram; this.name = name; this.color = color;
+            }
+        }
+        private final List<Point> points = new ArrayList<>();
 
         HistoryChart() {
             setBackground(Color.WHITE);
-            setPreferredSize(new Dimension(300, 110));
+            setPreferredSize(new Dimension(300, 130));
             setBorder(BorderFactory.createLineBorder(Theme.BORDER));
         }
 
-        void add(double cpu, double ram) {
-            points.add(new double[]{cpu, ram});
+        void add(double cpu, double ram, String name, Color color) {
+            points.add(new Point(cpu, ram, name, color));
             if (points.size() > 60) points.remove(0);
             repaint();
         }
@@ -428,24 +484,45 @@ public class MonitorPanel extends JPanel {
             super.paintComponent(g0);
             Graphics2D g = (Graphics2D) g0;
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            int w = getWidth(), h = getHeight(), pad = 8, top = 22;
+            int w = getWidth(), h = getHeight(), pad = 8, top = 22, band = 16;
+            int bottom = h - pad - band;           // jos lăsăm loc pentru banda cu procese
             g.setFont(Theme.BASE.deriveFont(11f));
             g.setColor(Theme.ACCENT);  g.drawString("● CPU %", pad, 15);
             g.setColor(Theme.PALETTE[1]); g.drawString("● RAM %", pad + 64, 15);
             g.setColor(Theme.MUTED);   g.drawString("ultimele 60 de citiri", w - 130, 15);
             g.setColor(new Color(0xEEEEEE));
             for (int i = 0; i <= 4; i++) {
-                int y = top + (h - top - pad) * i / 4;
+                int y = top + (bottom - top) * i / 4;
                 g.drawLine(pad, y, w - pad, y);
             }
+            if (points.isEmpty()) return;
+
+            // banda cu procesul care rula (din planificator)
+            g.setFont(Theme.BOLD.deriveFont(10f));
+            String lastName = null;
+            for (int i = 0; i < points.size(); i++) {
+                Point p = points.get(i);
+                if (p.color == null) { lastName = null; continue; }
+                int x1 = pad + (w - 2 * pad) * i / 59;
+                int x2 = pad + (w - 2 * pad) * (i + 1) / 59;
+                g.setColor(p.color);
+                g.fillRect(x1, bottom + 4, Math.max(2, x2 - x1), band - 4);
+                if (!p.name.equals(lastName)) {
+                    g.setColor(Color.WHITE);
+                    g.drawString(p.name, x1 + 2, bottom + band - 2);
+                }
+                lastName = p.name;
+            }
+
             if (points.size() < 2) return;
             g.setStroke(new BasicStroke(2f));
             for (int series = 0; series < 2; series++) {
                 g.setColor(series == 0 ? Theme.ACCENT : Theme.PALETTE[1]);
                 int prevX = -1, prevY = -1;
                 for (int i = 0; i < points.size(); i++) {
+                    double v = series == 0 ? points.get(i).cpu : points.get(i).ram;
                     int x = pad + (w - 2 * pad) * i / 59;
-                    int y = top + (int) ((h - top - pad) * (1 - points.get(i)[series] / 100.0));
+                    int y = top + (int) ((bottom - top) * (1 - v / 100.0));
                     if (prevX >= 0) g.drawLine(prevX, prevY, x, y);
                     prevX = x; prevY = y;
                 }

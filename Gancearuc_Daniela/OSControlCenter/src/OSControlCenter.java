@@ -40,8 +40,14 @@ public class OSControlCenter {
         tabs.addTab("Proiect", overview());
         tabs.addTab("Lab 1 · Timer", new TimerPanel());
         tabs.addTab("Lab 2 · Mediu VM", new EnvironmentPanel());
-        tabs.addTab("Lab 4 · Planificator", new SchedulerPanel());
-        tabs.addTab("Lab 5 · Monitor sistem", new MonitorPanel());
+        tabs.addTab("Lab 3 · Administrare", new AdminPanel());
+        MonitorPanel monitor = new MonitorPanel();                 // Lab 5
+        SchedulerPanel scheduler = new SchedulerPanel(monitor);   // Lab 4 îi trimite monitorului ce proces rulează
+        tabs.addTab("Lab 4 · Planificator", scheduler);
+        tabs.addTab("Lab 5 · Monitor sistem", monitor);
+
+        // la închidere oprim procesele pornite de rularea în timp real
+        Runtime.getRuntime().addShutdownHook(new Thread(scheduler::shutdown));
 
         frame.getContentPane().setBackground(Theme.BG);
         frame.add(header(), BorderLayout.NORTH);
@@ -87,7 +93,7 @@ public class OSControlCenter {
         intro.setFont(Theme.BASE.deriveFont(14f));
         intro.setForeground(Theme.TEXT);
 
-        JPanel grid = new JPanel(new GridLayout(2, 2, 14, 14));
+        JPanel grid = new JPanel(new GridLayout(2, 3, 14, 14));
         grid.setOpaque(false);
         grid.add(labCard("Lab 1 · Timer și Git",
             "Planificarea acțiunilor cu Timer și TimerTask: după un interval, la o oră exactă și periodic. "
@@ -95,15 +101,21 @@ public class OSControlCenter {
         grid.add(labCard("Lab 2 · Mașina virtuală și BIOS",
             "Programul afișează mediul în care rulează: sistemul de operare, resursele alocate VM-ului (CPU, RAM, disc), "
           + "dacă rulează în VirtualBox și dacă a pornit prin BIOS sau UEFI."));
+        grid.add(labCard("Lab 3 · Administrare",
+            "Utilizatori, grupuri, politica parolelor, ultimele logări, fișierul de pagină (swap) și pornirea automată. "
+          + "Pe Windows: net user, net localgroup, reg. Pe Debian: echivalentele lor (useradd, groupadd, chage)."));
         grid.add(labCard("Lab 4 · Planificarea proceselor",
             "Simulator pentru FCFS, SJF, SRTF, Round Robin, priorități, „cel mai scurt proces urmează” și planificarea echitabilă. "
-          + "Desenează diagrama Gantt și calculează timpii medii. Conține toate sarcinile din lucrare."));
+          + "Desenează diagrama Gantt, calculează timpii medii și poate executa planul în timp real, cu procese reale."));
         grid.add(labCard("Lab 5 · Funcții de nivel înalt",
             "Monitorizează CPU și RAM la fiecare 5 secunde, scrie un jurnal, lansează procese (editor, ping, traceroute), "
           + "adaugă programul la pornirea automată și poate reporni sistemul."));
+        grid.add(labCard("Toate împreună",
+            "„Rulează în timp real” (Lab 4): planificatorul decide, Timer-ul (Lab 1) execută, procese reale pornesc "
+          + "în VM (Lab 2, Lab 5), iar memoria și swap-ul se verifică din Lab 3."));
 
-        JTextArea lab3 = Theme.note("Lab 3 (administrarea Windows: conturi, registru, fișier de pagină) se prezintă separat, "
-            + "pe Windows, deoarece folosește instrumente care există doar în Windows.");
+        JTextArea lab3 = Theme.note("Programul merge și pe Windows, și pe Linux: Lab 3 folosește pe fiecare sistem comenzile lui "
+            + "(net user / useradd, registrul / ~/.config/autostart, pagefile.sys / swap).");
 
         JPanel top = new JPanel(new BorderLayout(0, 14));
         top.setOpaque(false);
@@ -111,14 +123,19 @@ public class OSControlCenter {
         top.add(grid, BorderLayout.CENTER);
 
         p.add(top, BorderLayout.NORTH);
-        p.add(Theme.card("Cum se leagă lucrările", new LinkDiagram()), BorderLayout.CENTER);
+        JPanel linkBody = new JPanel(new BorderLayout(0, 6));
+        linkBody.add(Theme.note("Butonul „Rulează în timp real” din Lab 4 le folosește pe toate odată: planificatorul calculează ordinea, "
+            + "un Timer o execută secundă cu secundă, pentru fiecare proces pornește un proces real în Debian, "
+            + "iar monitorul arată cum procesorul mașinii virtuale trece de la un proces la altul."), BorderLayout.NORTH);
+        linkBody.add(new LinkDiagram(), BorderLayout.CENTER);
+        p.add(Theme.card("Cum se leagă lucrările", linkBody), BorderLayout.CENTER);
         p.add(lab3, BorderLayout.SOUTH);
         return p;
     }
 
     /** O schemă simplă: unde rulează programul și ce module are. */
     private static class LinkDiagram extends JPanel {
-        LinkDiagram() { setPreferredSize(new Dimension(800, 210)); }
+        LinkDiagram() { setOpaque(false); setPreferredSize(new Dimension(800, 150)); }
 
         @Override protected void paintComponent(Graphics g0) {
             super.paintComponent(g0);
@@ -140,33 +157,22 @@ public class OSControlCenter {
             arrow(g, vm.x + vm.width, y1 + bh / 2, app.x, y1 + bh / 2, "rulează în");
 
             // rândul de jos: modulele programului
-            int y2 = Math.max(y1 + bh + 60, h - bh - 26);
-            int gap = (w - 40 - 3 * bw) / 2;
+            int y2 = Math.max(y1 + bh + 50, h - bh - 6);
+            int gap = (w - 40 - 4 * bw) / 3;
             Rectangle timer = new Rectangle(20, y2, bw, bh);
-            Rectangle sched = new Rectangle(20 + bw + gap, y2, bw, bh);
-            Rectangle mon   = new Rectangle(20 + 2 * (bw + gap), y2, bw, bh);
+            Rectangle admin = new Rectangle(20 + bw + gap, y2, bw, bh);
+            Rectangle sched = new Rectangle(20 + 2 * (bw + gap), y2, bw, bh);
+            Rectangle mon   = new Rectangle(20 + 3 * (bw + gap), y2, bw, bh);
             box(g, timer, "Timer (Lab 1)", "schedule, scheduleAtFixedRate", Theme.ACCENT);
+            box(g, admin, "Administrare (Lab 3)", "utilizatori, grupuri, swap", Theme.ACCENT);
             box(g, sched, "Planificator (Lab 4)", "FCFS, SJF, RR, ...", Theme.ACCENT);
             box(g, mon,   "Monitor (Lab 5)", "CPU, RAM, procese", Theme.ACCENT);
 
             int ax = app.x + app.width / 2, ay = app.y + bh;
-            for (Rectangle r : new Rectangle[]{timer, sched, mon}) {
+            for (Rectangle r : new Rectangle[]{timer, admin, sched, mon}) {
                 arrow(g, ax, ay, r.x + r.width / 2, r.y, null);
             }
-            // legătura Timer -> Monitor, trasă pe sub cutii ca să nu taie Planificatorul
-            int under = y2 + bh + 14;
-            int tx = timer.x + timer.width / 2, mx = mon.x + mon.width / 2;
-            g.setColor(Theme.MUTED);
-            g.drawLine(tx, y2 + bh, tx, under);
-            g.drawLine(tx, under, mx, under);
-            arrow(g, mx, under, mx, y2 + bh, null);
-            g.setFont(Theme.BASE.deriveFont(11f));
-            String note = "Timerul pornește citirea CPU/RAM la fiecare 5 s";
-            int nw = g.getFontMetrics().stringWidth(note);
-            g.setColor(Theme.CARD);
-            g.fillRect((tx + mx) / 2 - nw / 2 - 6, under - 8, nw + 12, 16);
-            g.setColor(Theme.MUTED);
-            g.drawString(note, (tx + mx) / 2 - nw / 2, under + 4);
+
         }
 
         private void box(Graphics2D g, Rectangle r, String title, String sub, Color c) {
