@@ -12,17 +12,14 @@ Cucerescu Liviu, IA-241
               │  /img/ → images     │
               │  /css/ → css        │
               └───┬─────────────┬───┘
-     rețeaua lab7net│             │
-        ┌──────────▼───┐   ┌─────▼────────┐
+   rețeaua lab7net│             │
+        ┌─────────▼────┐   ┌────▼─────────┐
         │ images       │   │ css          │
         │ (nginx)      │   │ (nginx)      │
-        │ avatar.svg   │   │ style.css    │
-        │ docker.svg   │   └──────────────┘
+        │ photo.jpg    │   │ style.css    │
+        │ avatar.svg   │   └──────────────┘
+        │ docker.svg   │
         └──────────────┘
-        ┌──────────────────────────────────┐
-        │ timer (Java 21): lab 1 refăcut   │
-        │ interval · moment · periodic     │
-        └──────────────────────────────────┘
 ```
 
 | Container | Imagine de bază | Ce face |
@@ -30,20 +27,17 @@ Cucerescu Liviu, IA-241
 | web | nginx:alpine | servește CV-ul și trimite /img/ și /css/ la celelalte containere |
 | images | nginx:alpine | servește imaginile |
 | css | nginx:alpine | servește foaia de stil |
-| timer | eclipse-temurin:21 (multi-stage) | lab 1 în Java: `java.util.Timer` |
 
 ## Rulare
 
 ```bash
-cd "lab 7"
+cd lab7
 docker compose up --build -d        # construiește și pornește tot
 ```
 
 - Site: http://localhost:8090
-- Imaginea direct: http://localhost:8090/img/avatar.svg
+- Imaginea direct: http://localhost:8090/img/photo.jpg
 - CSS direct: http://localhost:8090/css/style.css
-- Lab 1 (timer): `docker compose logs timer` sau rulat din nou: `docker compose run --rm timer`
-- Cu alte valori: `docker compose run --rm -e DELAY_SEC=5 -e REPEAT=3 timer`
 
 Verificare:
 
@@ -58,5 +52,4 @@ Oprire: `docker compose down`
 ## Optimizare
 
 - `nginx:alpine` (~50 MB) în loc de `nginx` (~190 MB).
-- Timer-ul are build în 2 etape: compilează cu JDK, rulează doar cu JRE (imagine mai mică).
 - Fiecare container are un singur rol; doar `web` are port deschis spre exterior.
