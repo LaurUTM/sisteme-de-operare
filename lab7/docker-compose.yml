@@ -1,0 +1,46 @@
+services:
+  web:                      # containerul 1: site-ul CV (nginx)
+    build: ./web
+    ports:
+      - "8090:80"           # browser: http://localhost:8090
+    depends_on: [images, css]
+    networks: [lab7net]
+    develop:                # "docker compose watch": copiaza modificarile in container
+      watch:
+        - action: sync
+          path: ./web/index.html
+          target: /usr/share/nginx/html/index.html
+        - action: sync+restart          # config nou => nginx trebuie repornit
+          path: ./web/nginx.conf
+          target: /etc/nginx/conf.d/default.conf
+
+  images:                   # containerul 2: imaginile
+    build: ./images
+    networks: [lab7net]
+    develop:
+      watch:
+        - action: sync
+          path: ./images
+          target: /usr/share/nginx/html
+          ignore: [Dockerfile]
+
+  css:                      # containerul 3: foaia de stil CSS
+    build: ./css
+    networks: [lab7net]
+    develop:
+      watch:
+        - action: sync
+          path: ./css/style.css
+          target: /usr/share/nginx/html/style.css
+
+  timer:                    # containerul 4: lab 1 (timere) in Java
+    build: ./timer
+    environment:
+      DELAY_SEC: 3
+      AT_SEC: 6
+      PERIOD_SEC: 2
+      REPEAT: 5
+    networks: [lab7net]
+
+networks:
+  lab7net:                  # retea comuna: containerele se gasesc dupa nume

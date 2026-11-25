@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV - Cucerescu Liviu</title>
+  <!-- CSS vine din containerul "css" (prin nginx: /css/ -> css) -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="cv">
+    <header class="top">
+      <!-- imaginea vine din containerul "images" (prin nginx: /img/ -> images) -->
+      <img class="avatar" src="/img/photo.jpg" alt="Cucerescu Liviu">
+      <div>
+        <h1>Cucerescu Liviu</h1>
+        <p class="role">Student IA-241 · Dezvoltator mobile &amp; web</p>
+        <p class="contact">Chișinău, Republica Moldova</p>
+      </div>
+    </header>
+
+    <section>
+      <h2>Despre mine</h2>
+      <p>Student în anul 3 la FCIM, Universitatea Tehnică a Moldovei. Lucrez la dezvoltarea de aplicații mobile și web.</p>
+    </section>
+
+    <section>
+      <h2>Experiență</h2>
+      <div class="item">
+        <h3>Dezvoltator · The Noughty Fox</h3>
+        <p>Aplicații mobile și web, computer vision.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Educație</h2>
+      <div class="item">
+        <h3>Universitatea Tehnică a Moldovei</h3>
+        <p>Facultatea Calculatoare, Informatică și Microelectronică · grupa IA-241</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Competențe</h2>
+      <ul class="skills">
+        <li>Java</li><li>Flutter / Dart</li><li>React / Next.js</li><li>TypeScript</li>
+        <li>Python</li><li>Docker</li><li>Git</li><li>Linux</li>
+      </ul>
+    </section>
+
+    <footer>
+      <img class="logo" src="/img/docker.svg" alt="Docker">
+      <span>Servit din 3 containere Docker: web, images, css</span>
+    </footer>
+  </main>
+</body>
+</html>

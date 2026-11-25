@@ -1,0 +1,72 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #e9eef3;
+  color: #222;
+  padding: 40px 16px;
+}
+
+.cv {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  background: #1d63ed;
+  color: #fff;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: #fff;
+  object-fit: cover;
+}
+
+.top h1 { font-size: 30px; }
+.role { font-size: 17px; opacity: 0.9; margin-top: 4px; }
+.contact { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+
+section { padding: 20px 32px; border-bottom: 1px solid #eee; }
+
+h2 {
+  font-size: 18px;
+  color: #1d63ed;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.item h3 { font-size: 16px; }
+.item p, section p { color: #555; margin-top: 4px; line-height: 1.5; }
+
+.skills { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.skills li {
+  background: #e8f0fe;
+  color: #1d63ed;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  font-size: 13px;
+  color: #777;
+}
+
+.logo { width: 32px; height: 32px; }
